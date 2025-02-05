@@ -1,0 +1,17 @@
+# configs/parameters.yml
+
+data_directory: "data/raw"
+arch: "vgg13"
+save_dir: "models"
+save_name: "model_checkpoint"
+learning_rate: 0.003
+epochs: 5
+print_every: 5
+freeze_parameters: True
+hidden_units: 512
+dropout: 0.2
+training_compute: "gpu"
+category_names: "configs/cat_to_name.json"
+top_k: 3
+checkpoint: "models/model_checkpoint"
+image_path: "tests/image_08115.jpg"
