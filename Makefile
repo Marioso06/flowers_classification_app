@@ -30,7 +30,7 @@ init-mario:
 	$(PIP) install -r requirements.txt
 
 	@echo "Finishing up setting up ROCm for Pytorch..."
-	
+
 	@location=$$($(PIP) show torch | grep Location | awk -F ": " '{print $$2}') && \
 	echo "Torch installed at: $$location" && \
 	test -n "$$location" || { echo "Error: Torch location is empty!"; exit 1; } && \
