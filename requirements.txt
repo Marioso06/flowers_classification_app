@@ -1,7 +1,5 @@
 matplotlib==3.10.0
-numpy==2.2.2
 Pillow==11.1.0
 PyYAML==6.0.2
 PyYAML==6.0.2
-torch==2.3.0+rocm6.2.3
-torchvision==0.18.0+rocm6.2.3
+gdown==5.2.0

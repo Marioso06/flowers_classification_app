@@ -4,8 +4,6 @@ import data_processing as dp
 from utils.model_configuration import ModelConfiguration as mc
 from utils.arg_parser import get_input_args
 
-
-
 class Trainer:
     def __init__(
             self, model, criterion, optimizer, 
@@ -119,19 +117,20 @@ class Trainer:
         print(f"Checkpoint saved to {self.save_directory}")
 
 if __name__ == "__main__":
-    print('===================== Training Started! =====================')
     in_arg = get_input_args()
+    print('===================== Training Started! =====================')
     #Data preprocessing
     data_preparation = dp.DataPreparation(
         data_dir=in_arg.data_directory,
-        download_url='https://s3.amazonaws.com/content.udacity-data.com/nd089/flower_data.tar.gz'
+        download_url='https://drive.google.com/uc?export=download&id=18I2XurHF94K072w4rM3uwVjwFpP_7Dnz'
     )
-    
+
     data_preparation.prepare_data()
+    print(in_arg.data_directory)
     trainloader, testloader, validloader = data_preparation.transform_data()
 
     #Load and Get pre-trained configured model
-    model_config = mc.ModelConfiguration(in_arg.freeze_parameters, in_arg.arch, in_arg.learning_rate, in_arg.hidden_units, in_arg.dropout, in_arg.training_compute)
+    model_config = mc(in_arg.freeze_parameters, in_arg.arch, in_arg.learning_rate, in_arg.hidden_units, in_arg.dropout, in_arg.training_compute)
     model, optimizer, criterion = model_config.get_model_and_optimizer()
 
     #Initilize training
