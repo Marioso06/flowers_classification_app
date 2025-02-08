@@ -72,6 +72,22 @@ init-gpu:
 
 	@echo "Setup complete! Run 'source $(VENV)/bin/activate' to activate the environment."
 
+#Create virtual enviroment 
+init-mac:
+	@echo "Creating virtual environment..."
+	python3 -m venv $(VENV)
+
+	@echo "Installing dependencies..."
+	$(PIP) install --upgrade pip
+
+	@echo "Installing additional requirements..."
+	$(PIP) install -r requirements.txt
+
+	@echo "Installing Pytorch - Mac"
+	$(PIP) torch torchvision torchaudio
+
+	@echo "Setup complete! Run 'source $(VENV)/bin/activate' to activate the environment."
+
 train:
 	@echo "Running train.py..."
 	$(PYTHON) src/train.py
