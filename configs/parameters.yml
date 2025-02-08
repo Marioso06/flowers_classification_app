@@ -3,7 +3,7 @@
 data_directory: "data/raw"
 arch: "vgg13"
 save_dir: "models"
-save_name: "model_checkpoint"
+save_name: "model_checkpoint.pth"
 learning_rate: 0.003
 epochs: 5
 print_every: 5

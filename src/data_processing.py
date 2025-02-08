@@ -20,8 +20,8 @@ class DataPreparation:
 
     def download_and_extract_data(self):
         commands = [
-            f"cd {self.data_dir} && wget '{self.download_url}'",
-            f"mkdir {self.data_dir}/flowers && tar -xzf flower_data.tar.gz -C {self.data_dir}/flowers"
+            f"cd {self.data_dir} && gdown '{self.download_url}' -O flower_data.tar.gz",
+            f"mkdir {self.data_dir}/flowers && cd {self.data_dir} && tar -xzf flower_data.tar.gz -C flowers"
         ]
 
         for command in commands:
@@ -49,9 +49,11 @@ class DataPreparation:
             self.download_and_extract_data()
 
     def transform_data(self):
-        train_dir = os.path.join(self.data_dir, 'train')
-        valid_dir = os.path.join(self.data_dir, 'valid')
-        test_dir = os.path.join(self.data_dir, 'test')
+        train_dir = os.path.join(self.data_dir, 'flowers/train')
+        valid_dir = os.path.join(self.data_dir, 'flowers/valid')
+        test_dir = os.path.join(self.data_dir, 'flowers/test')
+        print(self.data_dir)
+        print(train_dir)
 
         data_transforms = transforms.Compose([
             transforms.ToTensor(),
