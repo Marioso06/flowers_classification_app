@@ -6,9 +6,8 @@ PIP=$(VENV)/bin/pip
 # Default arguments (empty)
 ARGS=
 
-# Create virtual environment
-# Remember that you can change the pytorch installation based on your system requirements
-init-mario:
+# Create virtual environment this is for AMD GPUs
+init-amd:
 	@echo "Creating virtual environment..."
 	python3 -m venv $(VENV)
 	
@@ -41,10 +40,37 @@ init-mario:
 
 	@echo "Setup complete! Run 'source $(VENV)/bin/activate' to activate the environment."
 
-# Install dependencies
-install:
+#Create virtual enviroment this is for CPU - General usage
+init-cpu:
+	@echo "Creating virtual environment..."
+	python3 -m venv $(VENV)
+
 	@echo "Installing dependencies..."
+	$(PIP) install --upgrade pip
+
+	@echo "Installing additional requirements..."
 	$(PIP) install -r requirements.txt
+
+	@echo "Installing Pytorch - CPU"
+	$(PIP) install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu
+
+	@echo "Setup complete! Run 'source $(VENV)/bin/activate' to activate the environment."
+
+#Create virtual enviroment - this if for Nvidia GPU
+init-gpu:
+	@echo "Creating virtual environment..."
+	python3 -m venv $(VENV)
+
+	@echo "Installing dependencies..."
+	$(PIP) install --upgrade pip
+
+	@echo "Installing additional requirements..."
+	$(PIP) install -r requirements.txt
+
+	@echo "Installing Pytorch - GPU Nvidia"
+	$(PIP) torch torchvision torchaudio
+
+	@echo "Setup complete! Run 'source $(VENV)/bin/activate' to activate the environment."
 
 train:
 	@echo "Running train.py..."
