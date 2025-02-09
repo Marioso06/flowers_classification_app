@@ -1,7 +1,7 @@
 # configs/parameters.yml
 
 data_directory: "data/raw"
-arch: "vgg13"
+arch: "vgg19"
 save_dir: "models"
 save_name: "model_checkpoint.pth"
 learning_rate: 0.003
