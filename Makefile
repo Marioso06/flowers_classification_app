@@ -84,7 +84,7 @@ init-mac:
 	$(PIP) install -r requirements.txt
 
 	@echo "Installing Pytorch - Mac"
-	$(PIP) torch torchvision torchaudio
+	$(PIP) install --pre torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/nightly/cpu
 
 	@echo "Setup complete! Run 'source $(VENV)/bin/activate' to activate the environment."
 
