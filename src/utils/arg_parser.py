@@ -27,7 +27,7 @@ def get_input_args():
 
     parser.add_argument('--data_directory', type=str, default=config["data_directory"], help='Path to flower images')
 
-    parser.add_argument('--arch', type=str, default=config["arch"], choices=['vgg11', 'alexnet', 'resnet', 'vgg13'], help='CNN model architecture')
+    parser.add_argument('--arch', type=str, default=config["arch"], choices=['vgg11', 'vgg13', 'vgg19'], help='CNN model architecture')
 
     parser.add_argument('--save_name', type = str, default = config["save_name"], help = 'Checkpoint file name')
 
