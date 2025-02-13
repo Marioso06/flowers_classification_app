@@ -2,5 +2,6 @@
 .flower_classification/
 src/__pycache__
 src/utils/__pycache__
-data/
-models/
+/models
+mlruns/
+mlartifacts/

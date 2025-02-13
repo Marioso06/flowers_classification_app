@@ -54,7 +54,7 @@ class DataPreparation:
         test_dir = os.path.join(self.data_dir, 'flowers/test')
         print(self.data_dir)
         print(train_dir)
-
+        
         data_transforms = transforms.Compose([
             transforms.ToTensor(),
             transforms.Resize(225),

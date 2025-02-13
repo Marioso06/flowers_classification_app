@@ -88,6 +88,11 @@ init-mac:
 
 	@echo "Setup complete! Run 'source $(VENV)/bin/activate' to activate the environment."
 
+# MLFlow Initialization
+mlflow-init:
+	@echo "Initializing MLFlow server"
+	$(PYTHON) src/utils/mlflow_initialization.py
+
 train:
 	@echo "Running train.py..."
 	$(PYTHON) src/train.py

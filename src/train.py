@@ -1,6 +1,9 @@
 import torch
 import os
 import data_processing as dp
+import mlflow
+import mlflow.pytorch
+import yaml
 from utils.model_configuration import ModelConfiguration as mc
 from utils.arg_parser import get_input_args
 
@@ -52,6 +55,10 @@ class Trainer:
                 
                 if steps % self.print_every == 0:
                     valid_loss, accuracy = self.validate()
+                    mlflow.log_metric("train_loss", running_loss / self.print_every, step=steps)
+                    mlflow.log_metric("valid_loss", valid_loss / len(self.validloader), step=steps)
+                    mlflow.log_metric("valid_accuracy", accuracy / len(self.validloader), step=steps)
+
                     print(f"Epoch {epoch+1}/{self.epochs}.."
                         f"Train loss: {running_loss/self.print_every:.3f}.."
                         f"Valid loss: {valid_loss/len(self.validloader):.3f}.."
@@ -94,8 +101,9 @@ class Trainer:
                 equals = top_class == labels.view(*top_class.shape)
                 accuracy += torch.mean(equals.type(torch.FloatTensor)).item()
                             
-        print(f"Test accuracy: {accuracy/len(self.testloader):.3f}")
-        return accuracy
+        test_accuracy = accuracy / len(self.testloader)
+        print(f"Test accuracy: {test_accuracy:.3f}")
+        return test_accuracy    
 
     def save_checkpoint(self, epoch, class_to_idx):
         if not os.path.exists(os.path.dirname(self.save_directory)):
@@ -117,8 +125,11 @@ class Trainer:
         print(f"Checkpoint saved to {self.save_directory}")
 
 if __name__ == "__main__":
+    mlflow.pytorch.autolog()
+    mlflow.set_experiment("Flowers Classification App")
+    mlflow.set_tracking_uri("http://localhost:8080")
     in_arg = get_input_args()
-    print('===================== Training Started! =====================')
+    print('===================== Data Preparation Started! =====================')
     #Data preprocessing
     data_preparation = dp.DataPreparation(
         data_dir=in_arg.data_directory,
@@ -128,7 +139,12 @@ if __name__ == "__main__":
     data_preparation.prepare_data()
     print(in_arg.data_directory)
     trainloader, testloader, validloader = data_preparation.transform_data()
-
+    
+    print('===================== Data Preparation Finished! =====================')
+    
+    with open('data/raw.dvc', 'r') as f:
+        dvc_info = yaml.safe_load(f)
+    dataset_md5 = dvc_info['outs'][0]['md5']
     #Load and Get pre-trained configured model
     model_config = mc(in_arg.freeze_parameters, in_arg.arch, in_arg.learning_rate, in_arg.hidden_units, in_arg.dropout, in_arg.training_compute)
     model, optimizer, criterion = model_config.get_model_and_optimizer()
@@ -140,7 +156,31 @@ if __name__ == "__main__":
                       in_arg.print_every, save_directory,
                       in_arg.freeze_parameters, in_arg.arch, in_arg.learning_rate, 
                       in_arg.hidden_units, in_arg.dropout, in_arg.training_compute)
-    trainer.train()
-    trainer.test()
-    trainer.save_checkpoint(in_arg.epochs, class_to_idx=trainloader.dataset.class_to_idx)
+    # Start an MLflow run to track the experiment
+    with mlflow.start_run(run_name=f"classification_{in_arg.arch}_{in_arg.training_compute}") as run:
+        # Log experiment parameters from the command line or config file
+        mlflow.log_params({
+            "epochs": in_arg.epochs,
+            "print_every": in_arg.print_every,
+            "freeze_parameters": in_arg.freeze_parameters,
+            "architecture": in_arg.arch,
+            "learning_rate": in_arg.learning_rate,
+            "hidden_units": in_arg.hidden_units,
+            "dropout": in_arg.dropout,
+            "training_compute": in_arg.training_compute
+        })
+        mlflow.set_tag("Dataset Version", dataset_md5)
+        # Run training, testing, and checkpoint saving
+        print('===================== Training Started! =====================')
+        trainer.train()
+        test_accuracy = trainer.test()
+        mlflow.log_metric("test_accuracy", test_accuracy)
+        mlflow.pytorch.log_model(
+            pytorch_model=trainer.model,
+            artifact_path=f"model_{in_arg.arch}_{in_arg.learning_rate}_{in_arg.hidden_units}"
+        )
+        trainer.save_checkpoint(in_arg.epochs, class_to_idx=trainloader.dataset.class_to_idx)
+        
+        print(f"MLflow Run ID: {run.info.run_id}")
+        mlflow.end_run()
     print('===================== Training completed! =====================')
