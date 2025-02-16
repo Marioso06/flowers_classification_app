@@ -35,7 +35,26 @@ ml_project/
 └── .gitignore
 ```
 
+## NOTE
+
 You should add `dvc`, `dvc-gdrive` and `mlflow` as dependencies in your `requirements.text` file. Remember that you can delete your python environement and create a new one or just run `pip3 install -r requirements.txt` within the root folder of your project. But remember that requirements does not include `Pytorch`, this dependency is always installed using the `make` command (one of the options like `make init-cpu`, `init-gpu etc`).
+--
+Notice the presence of two distinct YAML configuration files: `train_config.yaml` and `predict_config.yaml`. These files serve as centralized locations for setting parameters related to training and prediction, respectively. By using configuration files, you can adjust your experimental settings without altering the core codebase. This approach offers several benefits:
+
+* Modularity: Keeping configuration separate from code makes your project cleaner and more organized.
+* Flexibility: Easily change parameters (e.g., learning rates, batch sizes, model paths) by modifying the configuration files without risking unintended code changes.
+* Reproducibility: Tracking changes in configuration files simplifies experiment replication and debugging.
+* Collaboration: Team members can adjust settings independently, reducing merge conflicts and enhancing collaborative efforts.
+
+For example, the `parameters.yml` file in the Flowers Classification repository on my GitHub serves a similar purpose by encapsulating all key settings and hyperparameters. This best practice is widely used in software development to maintain clean, maintainable, and scalable code.
+
+Configuration files can also help manage sensitive information such as API keys, passwords, or tokens more securely by:
+
+* Separation of Concerns: By isolating sensitive data in dedicated configuration files, you can prevent accidental exposure in your source code.
+* Version Control Practices: Exclude configuration files that contain secrets from version control (e.g., using `.gitignore`) to ensure that sensitive information is not shared publicly.
+* Access Control: Centralizing sensitive data in configuration files allows you to implement stricter access controls, ensuring that only authorized personnel or systems can access critical information.
+
+For more information on how the `paramters.yml` in the Flowers Classification app works see the `How_arg_parser_works.md`
 
 # DVC Instructions
 
@@ -69,7 +88,7 @@ You should add `dvc`, `dvc-gdrive` and `mlflow` as dependencies in your `require
 
 3. **Using `.dvcignore`:**
     
-    If there are subdirectories or files in data/ that you do not want to track (e.g., temporary files), create or update the .dvcignore file in your project root. For example:
+    If there are subdirectories or files in `data/` that you do not want to track (e.g., temporary files), create or update the `.dvcignore` file in your project root. For example:
 
     ```bash
     #within your .dvcignore file you will add
@@ -77,7 +96,7 @@ You should add `dvc`, `dvc-gdrive` and `mlflow` as dependencies in your `require
     cache/
     ```
 
-    Expected Outcome: DVC creates .dvc files (e.g., `data/raw.dvc`, `data/processed.dvc`) that track the metadata of your datasets.
+    Expected Outcome: DVC creates `.dvc` files (e.g., `data/raw.dvc`, `data/processed.dvc`) that track the metadata of your datasets.
 
 3. **Configure Remote Storage and Commit Changes**
 
@@ -137,7 +156,7 @@ You should add `dvc`, `dvc-gdrive` and `mlflow` as dependencies in your `require
 
     * Parameter Logging: 
     
-        All parameters from your YAML configuration are logged using mlflow.log_params(config).
+        All parameters from your YAML configuration are logged using `mlflow.log_params(config)`.
 
     * Metric Logging: 
     
@@ -145,11 +164,11 @@ You should add `dvc`, `dvc-gdrive` and `mlflow` as dependencies in your `require
     
     * Model Logging: 
     
-        The trained scikit-learn model is logged with mlflow.sklearn.log_model().
+        The trained scikit-learn model is logged with `mlflow.sklearn.log_model()`.
     
     * Autolog: 
     
-        Enabling mlflow.sklearn.autolog() automatically logs parameters, metrics, and the model.
+        Enabling `mlflow.sklearn.autolog()` automatically logs parameters, metrics, and the model.
 
     **Expected Outcome**: When you run the training script, an MLflow run is created that captures configuration parameters, training metrics, and the saved model.
 
@@ -178,9 +197,14 @@ You should add `dvc`, `dvc-gdrive` and `mlflow` as dependencies in your `require
 
     Running Multiple Experiments
 
-    * Modify hyperparameters in configs/train_config.yaml (e.g., adjust model parameters, learning rates, or other configurations).
+    * Modify hyperparameters in configs/train_config.yaml (e.g., adjust model parameters, learning rates, or other configurations used in your ML project).
     * Run the training script multiple times with different hyperparameters.
-    * Each run will be recorded in MLflow, allowing you to compare performance metrics.
+    * Each run will be recorded in MLflow, allowing you to compare performance metrics. Remember that each run you perform will be unique, pleasse check the `train.py` in the Flower Classification App on how you can create a unique name for each run in your experiment. It should look something like this:
+    ```python
+    # Start an MLflow run to track the experiment
+    with mlflow.start_run(run_name=f"classification_{in_arg.arch}_{in_arg.training_compute}") as run:
+    ```
+    Note that the name is constructed using some of the parameters used for that run, that will help you have unique names in MLFlow.
     
     Compare Experiments in the MLflow UI
     
@@ -206,7 +230,7 @@ You should add `dvc`, `dvc-gdrive` and `mlflow` as dependencies in your `require
 
 # Deliverables
 
-For this lab assignment, you must submit the following:
+For this lab assignment, you must submit the following in a zip file:
 
 **Screenshots**:
 
@@ -218,4 +242,4 @@ For this lab assignment, you must submit the following:
 
 **DVC Remote Storage Link**:
 
-    Provide a link or reference to the remote storage where your data is versioned.
+    Provide a link or reference to the remote storage where your data is versioned and sotored (remember that you will be using your Google Drive as a remote storage).
