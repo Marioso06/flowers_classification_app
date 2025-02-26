@@ -143,12 +143,17 @@ if __name__ == "__main__":
     
     print('===================== Data Preparation Finished! =====================')
     
-    if os.path.exists(file_path):
-        with open(file_path, 'r') as f:
-            dvc_info = yaml.safe_load(f)
-        dataset_md5 = dvc_info['outs'][0]['md5']
-    else:
-        dataset_md5 = "data_not_tracked"
+    if os.path.exists('data/raw.dvc'):
+        try:
+            with open('data/raw.dvc', 'r') as f:
+                dvc_info = yaml.safe_load(f)
+            dataset_md5 = dvc_info['outs'][0]['md5']
+        except (FileNotFoundError, KeyError, yaml.YAMLError) as e:
+            print(f"Error reading or parsing DVC file: {e}")
+            dataset_md5 = "data_not_tracked"  # Or raise the exception if you prefer
+        except IndexError as e:
+            print(f"Error: 'outs' list is empty in the DVC file or does not contain a dictionary with 'md5': {e}")
+            dataset_md5 = "data_not_tracked"
     
     #Load and Get pre-trained configured model
     model_config = mc(in_arg.freeze_parameters, in_arg.arch, in_arg.learning_rate, in_arg.hidden_units, in_arg.dropout, in_arg.training_compute)
