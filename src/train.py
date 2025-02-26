@@ -128,6 +128,7 @@ if __name__ == "__main__":
     mlflow.pytorch.autolog()
     mlflow.set_experiment("Flowers Classification App")
     mlflow.set_tracking_uri("http://localhost:8080")
+    file_path = 'data/raw.dvc'
     in_arg = get_input_args()
     print('===================== Data Preparation Started! =====================')
     #Data preprocessing
@@ -142,9 +143,13 @@ if __name__ == "__main__":
     
     print('===================== Data Preparation Finished! =====================')
     
-    with open('data/raw.dvc', 'r') as f:
-        dvc_info = yaml.safe_load(f)
-    dataset_md5 = dvc_info['outs'][0]['md5']
+    if os.path.exists(file_path):
+        with open(file_path, 'r') as f:
+            dvc_info = yaml.safe_load(f)
+        dataset_md5 = dvc_info['outs'][0]['md5']
+    else:
+        dataset_md5 = "data_not_tracked"
+    
     #Load and Get pre-trained configured model
     model_config = mc(in_arg.freeze_parameters, in_arg.arch, in_arg.learning_rate, in_arg.hidden_units, in_arg.dropout, in_arg.training_compute)
     model, optimizer, criterion = model_config.get_model_and_optimizer()

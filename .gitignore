@@ -5,3 +5,4 @@ src/utils/__pycache__
 /models
 mlruns/
 mlartifacts/
+data/raw/

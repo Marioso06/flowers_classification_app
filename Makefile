@@ -7,7 +7,7 @@ PIP=$(VENV)/bin/pip
 ARGS=
 
 # Create virtual environment this is for AMD GPUs
-init-amd:
+init-amd-wsl:
 	@echo "Creating virtual environment..."
 	python3 -m venv $(VENV)
 	
@@ -37,6 +37,24 @@ init-amd:
 	cd $$location/torch/lib/ && \
 	rm -f libhsa-runtime64.so* && \
 	cp /opt/rocm/lib/libhsa-runtime64.so.1.2 libhsa-runtime64.so
+
+	@echo "Setup complete! Run 'source $(VENV)/bin/activate' to activate the environment."
+
+# Create virtual environment this is for AMD GPUs
+init-amd-linux:
+	@echo "Creating virtual environment..."
+	python3 -m venv $(VENV)
+	
+	@echo "Installing dependencies..."
+	$(PIP) install --upgrade pip
+
+	@echo "Installing downloaded ROCm packages..."
+	$(PIP) install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/rocm6.2.4
+
+	@echo "Installing additional requirements..."
+	$(PIP) install -r requirements.txt
+
+	@echo "Finishing up setting up ROCm for Pytorch..."
 
 	@echo "Setup complete! Run 'source $(VENV)/bin/activate' to activate the environment."
 
