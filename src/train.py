@@ -119,7 +119,8 @@ class Trainer:
             'learning_rate': self.learning_rate,
             'hidden_units': self.hidden_units,
             'dropout': self.dropout,
-            'training_compute': self.training_compute
+            'training_compute': self.training_compute,
+            "classifier": self.model.classifier
         }
         torch.save(checkpoint, self.save_directory)
         print(f"Checkpoint saved to {self.save_directory}")
