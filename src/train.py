@@ -154,6 +154,8 @@ if __name__ == "__main__":
         except IndexError as e:
             print(f"Error: 'outs' list is empty in the DVC file or does not contain a dictionary with 'md5': {e}")
             dataset_md5 = "data_not_tracked"
+    else:
+        dataset_md5 = "data_not_tracked"
     
     #Load and Get pre-trained configured model
     model_config = mc(in_arg.freeze_parameters, in_arg.arch, in_arg.learning_rate, in_arg.hidden_units, in_arg.dropout, in_arg.training_compute)
