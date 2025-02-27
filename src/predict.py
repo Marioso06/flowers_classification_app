@@ -28,11 +28,19 @@ class Predict:
             # Load the checkpoint
             checkpoint = torch.load(checkpoint_path)
             
-            # Load the model architecture
-            architecture = checkpoint.get('architecture', 'vgg19')
-            model = getattr(models, architecture)(pretrained=True)
+            checkpoint = torch.load(checkpoint_path)
+            architecture = checkpoint.get("architecture", "vgg13")
+            if architecture == "vgg11":
+                model = models.vgg11(weights=None)  # Weights=None, since we’ll load ours
+            elif architecture == "vgg13":
+                model = models.vgg13(weights=None)
+            elif architecture == "vgg16":
+                model = models.vgg16(weights=None)
+            elif architecture == "vgg19":
+                model = models.vgg19(weights=None)
+            else:
+                raise ValueError(f"Unknown architecture: {architecture}")
             
-            # Rebuild the classifier
             if 'classifier' in checkpoint:
                 model.classifier = checkpoint['classifier']
             
