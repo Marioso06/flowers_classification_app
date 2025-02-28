@@ -45,7 +45,7 @@ def get_input_args():
 
     parser.add_argument('--dropout', type=float, default=config["dropout"], help='Dropout probability')
 
-    parser.add_argument('--training_compute', type=str, default=config["training_compute"], choices=['cpu', 'gpu'], help='Use CPU or GPU')
+    parser.add_argument('--training_compute', type=str, default=config["training_compute"], choices=['cpu', 'gpu', 'mps'], help='Use CPU or GPU')
 
     parser.add_argument('--category_names', type=str, default=config["category_names"], help='Path to category name mapping file')
 
