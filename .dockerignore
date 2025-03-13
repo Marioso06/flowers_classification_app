@@ -1,0 +1,28 @@
+# Python cache files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Data directories
+data/raw/
+data/processed/
+data/external/
+predictions/
+
+# Virtual environment
+.flower_classification/
+
+# MLflow
+mlruns/
+
+# Testing
+.pytest_cache/
+
+# Version control
+.git/
+.gitignore
+
+# Docker
+.dockerignore
+Dockerfile
+docker-compose.yml
