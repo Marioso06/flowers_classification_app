@@ -202,8 +202,8 @@ docker-compose up --build
 ```
 
 This command builds both Docker images and starts the containers. Your services will be available at:
-- ML Application API: http://localhost:5000
-- MLflow UI: http://localhost:5001
+- ML Application API: http://localhost:(your-api-port)
+- MLflow UI: http://localhost:(your-mlflow-port)
 
 ### 6. Publishing Your Docker Images
 
@@ -246,6 +246,180 @@ Submit the following:
    * Commit history should demonstrate contributions from all team members
    * Include a brief description of each member's contribution to the containerization process
 
+## Implementing Logging in Your Containerized Application
+
+Proper logging is essential for monitoring and troubleshooting containerized applications. For this assignment, you will implement the Python `logging` package in your application to create structured logs for your Docker containers.
+
+### Python Logging Basics
+
+The Python `logging` module provides a flexible framework for emitting log messages from applications. Here's how to implement it directly in your application:
+
+```python
+import logging
+
+# Configure basic logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.StreamHandler(),  # Log to console
+        logging.FileHandler('app.log')  # Log to file
+    ]
+)
+
+# Create a logger for a specific module
+logger = logging.getLogger(__name__)
+
+# Example usage
+def predict(data):
+    try:
+        logger.info(f"Received prediction request with shape: {data.shape}")
+        result = model.predict(data)
+        logger.info(f"Prediction successful")
+        return result
+    except Exception as e:
+        logger.error(f"Prediction failed with error: {str(e)}")
+        raise
+```
+
+### Logging from Different Modules
+
+Structure your logging configuration to separate logs by module:
+
+```python
+# In src/logging_config.py <<<If you want to perform this approach, you will need to create this file in src folder>>>
+import logging
+import os
+
+def configure_logging(log_directory='logs'):
+    # Create logs directory if it doesn't exist
+    os.makedirs(log_directory, exist_ok=True)
+    
+    # Configure root logger
+    logging.basicConfig(
+        level=logging.INFO,
+        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    )
+    
+    # Create module-specific loggers
+    modules = ['train', 'predict', 'api']
+    loggers = {}
+    
+    for module in modules:
+        logger = logging.getLogger(f'ml_app.{module}')
+        file_handler = logging.FileHandler(f'{log_directory}/{module}.log')
+        file_handler.setFormatter(logging.Formatter('%(asctime)s - %(levelname)s - %(message)s'))
+        logger.addHandler(file_handler)
+        loggers[module] = logger
+    
+    return loggers
+```
+
+### Using the Loggers in Your Application
+
+In your application modules you can directly do (this assumes you have created logging_config.py in src folder):
+
+```python
+# In src/train.py
+from logging_config import configure_logging
+
+loggers = configure_logging()
+logger = loggers['train']
+
+def train_model():
+    logger.info("Starting model training")
+    # Training code here
+    logger.info(f"Model trained successfully with accuracy: {accuracy}")
+```
+
+### Docker Logging Integration
+
+When running applications in Docker containers, it's best practice to:  
+
+1. **Log to stdout/stderr**: Docker captures these streams
+
+   ```python
+   # Configure logging to write to stdout
+   logging.basicConfig(
+       level=logging.INFO,
+       format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+       handlers=[logging.StreamHandler()]  # Log to stdout
+   )
+   ```
+
+2. **Modify your Dockerfile to handle logs**:
+
+   ```dockerfile
+   # Create a logs directory in the container
+   RUN mkdir -p /app/logs
+   
+   # Set an environment variable for log location
+   ENV LOG_DIR=/app/logs
+   
+   # Volume mount for persistent logs (in docker-compose.yml)
+   volumes:
+     - ./logs:/app/logs
+   ```
+
+3. **Implement log rotation** (this helps to keep log at a controllable size):
+
+   ```python
+   from logging.handlers import RotatingFileHandler
+   
+   handler = RotatingFileHandler(
+       'app.log',
+       maxBytes=10485760,  # 10MB
+       backupCount=5
+   )
+   logger.addHandler(handler)
+   ```
+
+### Example: Adding Logging to predict_api.py
+
+Update your `predict_api.py` file to include proper logging:
+
+```python
+import logging
+import os
+from flask import Flask, request, jsonify
+
+# Configure logging
+log_dir = os.environ.get("LOG_DIR", "logs")
+os.makedirs(log_dir, exist_ok=True)
+
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.StreamHandler(),
+        logging.FileHandler(f"{log_dir}/api.log")
+    ]
+)
+
+logger = logging.getLogger("ml_app.api")
+
+app = Flask(__name__)
+
+@app.route('/v1/predict', methods=['POST'])
+def predict_v1():
+    try:
+        data = request.get_json()
+        logger.info(f"Received prediction request (v1) with data: {data}")
+        
+        # Model prediction code
+        result = model_v1.predict([data])
+        
+        logger.info(f"Prediction (v1) successful: {result}")
+        return jsonify({"prediction": result.tolist()})
+    except Exception as e:
+        logger.error(f"Prediction (v1) failed: {str(e)}")
+        return jsonify({"error": str(e)}), 500
+
+if __name__ == "__main__":
+    logger.info("Starting prediction API service")
+    app.run(host="0.0.0.0", port=5000)
+```
+
 ## Evaluation Criteria
 
 Your assignment will be evaluated based on:
@@ -254,8 +428,9 @@ Your assignment will be evaluated based on:
 2. **Code Quality**: Well-organized and well-documented Dockerfiles and docker-compose.yml
 3. **Data Management**: Appropriate strategy for handling data (volume mounting or copying)
 4. **MLflow Integration**: Proper configuration allowing your ML application to log to MLflow
-5. **Documentation**: Clear instructions on how to build and run your containers
-6. **Teamwork**: Evidence of contributions from all team members
+5. **Logging Implementation**: Proper implementation of Python logging for monitoring and troubleshooting
+6. **Documentation**: Clear instructions on how to build and run your containers
+7. **Teamwork**: Evidence of contributions from all team members
 
 ## Tips for Success
 
