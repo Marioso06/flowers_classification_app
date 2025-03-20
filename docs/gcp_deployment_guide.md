@@ -287,9 +287,9 @@ gcloud compute instances create flowers-training-vm \
     # Clone the repository
     mkdir -p /opt/flowers
     cd /opt/flowers
-    git clone https://github.com/your-repo/flowers_classification_app.git
+    git clone https://github.com/Marioso06/flowers_classification_app.git
     cd flowers_classification_app
-
+    git checkout lab_cloud_gcp
     # Set up Python environment
     make init-cpu
 
