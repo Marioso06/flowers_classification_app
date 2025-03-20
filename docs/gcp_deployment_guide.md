@@ -288,6 +288,9 @@ gcloud compute instances create flowers-training-vm \
     mkdir -p /opt/flowers
     cd /opt/flowers
     git clone https://github.com/Marioso06/flowers_classification_app.git
+    mkdir -p /opt/flowers/flowers_classification_app/data_temp
+    chown -R $USER:$USER /opt/flowers/flowers_classification_app/data_temp
+    chmod -R 755 /opt/flowers/flowers_classification_app/data_temp
     cd flowers_classification_app
     git checkout lab_cloud_gcp
     # Set up Python environment
@@ -322,10 +325,10 @@ export MLFLOW_TRACKING_URI="http://$MLFLOW_IP:5000"  # Replace with your MLflow 
 # Run the training script with CPU optimization
 python src/train.py \
     --data_directory data/flowers \
-    --arch vgg16 \
+    --arch vgg13 \
     --learning_rate 0.001 \
     --hidden_units 512 \
-    --epochs 5 \
+    --epochs 1 \
     --save_dir "gs://$BUCKET_NAME/models" \
     --save_name "model_checkpoint_cpu.pth" \
     --training_compute cpu \
@@ -486,3 +489,8 @@ This guide provides a comprehensive approach to deploying the Flowers Classifica
 5. Configured monitoring and maintenance for your infrastructure
 
 The application is now ready for production use with proper database backing, cloud storage integration, and scalable API endpoints.
+
+
+ export BUCKET_NAME="flowers-classification-data-1-1742430057"
+(.flower_classification) marioasmca@flowers-training-vm:/opt/flowers/flowers_classification_app$ export PYTHONPATH=/opt/flowers/flowers_classification_app
+(.flower_classification) marioasmca@flowers-training-vm:/opt/flowers/flowers_classification_app$ export MLFLOW_TRACKING_URI="http://34.173.41.21:5000"
