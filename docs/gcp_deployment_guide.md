@@ -50,7 +50,7 @@ First we would need to get the data into our cloud environment by executing the 
 
 ```bash
 mkdir -p data/raw && cd data/raw
-wget https://storage.googleapis.com/flowers-classification-lab/flower_data.tar.gz
+wget --no-check-certificate "https://drive.usercontent.google.com/download?id=18I2XurHF94K072w4rM3uwVjwFpP_7Dnz&export=download&confirm=t&uuid=7feba52a-4578-499a-b3bc-469e687781f4" -O flower_data.tar.gz
 tar -xzf flower_data.tar.gz
 cd ../..
 
@@ -68,10 +68,6 @@ The app already comes with a GCP configuration file that contains settings for b
 ```bash
 # View the GCP configuration file content
 cat configs/gcp_config.py
-
-# Update the bucket name in environment variables to match our created bucket
-export BUCKET_NAME="your-bucket-name"  # Replace with your actual bucket name
-echo "Bucket name set to: $BUCKET_NAME"
 ```
 
 Verify that the GCS utility functions are available in `src/utils/gcs_utils.py`:
@@ -137,7 +133,7 @@ gcloud compute instances create mlflow-server \
     # Clone the repository
     mkdir -p /opt/mlflow
     cd /opt/mlflow
-    git clone https://github.com/your-repo/flowers_classification_app.git
+    git clone https://github.com/Marioso06/flowers_classification_app.git
     cd flowers_classification_app
 
     # Set up Python environment
