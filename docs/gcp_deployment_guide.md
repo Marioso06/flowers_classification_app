@@ -125,39 +125,43 @@ gcloud compute instances create mlflow-server \
     --image-project=debian-cloud \
     --scopes=https://www.googleapis.com/auth/cloud-platform \
     --tags=mlflow-server \
-    --metadata=startup-script='#! /bin/bash
-    # Install dependencies
-    apt-get update
-    apt-get install -y git python3-pip python3-venv postgresql-client
+    --metadata=startup-script='#!/bin/bash
+exec > /var/log/startup-script.log 2>&1
+set -x
 
-    # Clone the repository
-    mkdir -p /opt/mlflow
-    cd /opt/mlflow
-    git clone https://github.com/Marioso06/flowers_classification_app.git
-    cd flowers_classification_app
+# Update and install dependencies
+apt-get update
+apt-get install -y git python3-pip python3-venv postgresql-client
 
-    # Set up Python environment
-    python3 -m venv .mlflow_env
-    source .mlflow_env/bin/activate
-    pip install --upgrade pip
-    pip install mlflow==2.20.2 google-cloud-storage psycopg2-binary
+# Clone the repository
+mkdir -p /opt/mlflow
+cd /opt/mlflow
+git clone https://github.com/Marioso06/flowers_classification_app.git
+cd flowers_classification_app
+git checkout lab_cloud_gcp
+# Set up Python environment
+python3 -m venv .mlflow_env
+source .mlflow_env/bin/activate
+pip install --upgrade pip
+pip install mlflow==2.20.2 google-cloud-storage psycopg2-binary
 
-    # Set environment variables
-    export BUCKET_NAME="'$BUCKET_NAME'"
-    export USE_GCS_FOR_MLFLOW="true"
-    export MLFLOW_HOST="0.0.0.0"
-    export MLFLOW_PORT="5000"
-    export DB_HOST="'$DB_HOST'"
-    export DB_USER="'$DB_USER'"
-    export DB_PASSWORD="'$DB_PASSWORD'"
-    export DB_NAME="'$DB_NAME'"
-    export MLFLOW_DB_URI="postgresql://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:5432/${DB_NAME}"
-    export USE_POSTGRES_FOR_MLFLOW="true"
-    
-    # Initialize MLflow with GCS artifact storage and PostgreSQL backend
-    python src/utils/mlflow_initialization.py --use-gcs --use-postgres &
-    
-    echo "MLflow server started on port 5000"'
+# Set environment variables
+export BUCKET_NAME="'$BUCKET_NAME'"
+export USE_GCS_FOR_MLFLOW="true"
+export MLFLOW_HOST="0.0.0.0"
+export MLFLOW_PORT="5000"
+export DB_HOST="'$DB_HOST'"
+export DB_USER="'$DB_USER'"
+export DB_PASSWORD="'$DB_PASSWORD'"
+export DB_NAME="'$DB_NAME'"
+export MLFLOW_DB_URI="postgresql://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:5432/${DB_NAME}"
+export USE_POSTGRES_FOR_MLFLOW="true"
+
+# Initialize MLflow with GCS artifact storage and PostgreSQL backend in the background
+python src/utils/mlflow_initialization.py --use-gcs --use-postgres &
+
+echo "MLflow server started on port 5000"
+'
 ```
 
 ### Step 3: Allow MLflow Traffic
