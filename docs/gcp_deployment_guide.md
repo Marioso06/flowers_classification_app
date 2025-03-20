@@ -114,7 +114,7 @@ export DB_PASSWORD="MLFLOW_USER_PASSWORD_HERE"
 export DB_NAME="mlflow"
 ```
 
-### Step 2: Create a Compute Engine VM for MLflow
+### Step 2: Create a Compute Engine VM for MLflow (Installation Only)
 
 ```bash
 gcloud compute instances create mlflow-server \
@@ -139,28 +139,39 @@ cd /opt/mlflow
 git clone https://github.com/Marioso06/flowers_classification_app.git
 cd flowers_classification_app
 git checkout lab_cloud_gcp
+
 # Set up Python environment
 python3 -m venv .mlflow_env
 source .mlflow_env/bin/activate
 pip install --upgrade pip
 pip install mlflow==2.20.2 google-cloud-storage psycopg2-binary
 
+# Create a configuration file for running MLflow later
+cat > /opt/mlflow/run_mlflow.sh << EOF
+#!/bin/bash
+cd /opt/mlflow/flowers_classification_app
+source .mlflow_env/bin/activate
+
 # Set environment variables
-export BUCKET_NAME="'$BUCKET_NAME'"
+export BUCKET_NAME="$BUCKET_NAME"
 export USE_GCS_FOR_MLFLOW="true"
 export MLFLOW_HOST="0.0.0.0"
 export MLFLOW_PORT="5000"
-export DB_HOST="'$DB_HOST'"
-export DB_USER="'$DB_USER'"
-export DB_PASSWORD="'$DB_PASSWORD'"
-export DB_NAME="'$DB_NAME'"
-export MLFLOW_DB_URI="postgresql://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:5432/${DB_NAME}"
+export DB_HOST="$DB_HOST"
+export DB_USER="$DB_USER"
+export DB_PASSWORD="$DB_PASSWORD"
+export DB_NAME="$DB_NAME"
+export MLFLOW_DB_URI="postgresql://\$DB_USER:\$DB_PASSWORD@\$DB_HOST:5432/\$DB_NAME"
 export USE_POSTGRES_FOR_MLFLOW="true"
+export PYTHONPATH=/opt/mlflow/flowers_classification_app:\$PYTHONPATH
 
-# Initialize MLflow with GCS artifact storage and PostgreSQL backend in the background
-python src/utils/mlflow_initialization.py --use-gcs --use-postgres &
-
+# Start MLflow
+nohup python src/utils/mlflow_initialization.py --host 0.0.0.0 --port 5000 --use-gcs --use-postgres > mlflow.log 2>&1 &
 echo "MLflow server started on port 5000"
+EOF
+
+chmod +x /opt/mlflow/run_mlflow.sh
+echo "VM setup complete. Ready to start MLflow after Cloud SQL authorization."
 '
 ```
 
@@ -178,7 +189,49 @@ gcloud compute firewall-rules create allow-mlflow \
     --target-tags=mlflow-server
 ```
 
-### Step 4: Get the MLflow Server External IP
+### Step 4: Authorize the VM to Connect to Cloud SQL
+
+By default, Cloud SQL instance connections are blocked. You need to authorize your VM's IP address to connect to your PostgreSQL instance:
+
+```bash
+# Get the VM's external IP
+VM_IP=$(gcloud compute instances describe mlflow-server --zone=us-central1-a --format="value(networkInterfaces[0].accessConfigs[0].natIP)")
+echo "VM IP: $VM_IP"
+
+# Add the VM's IP to Cloud SQL authorized networks
+gcloud sql instances patch mlflow-db --authorized-networks=$VM_IP
+```
+
+### Step 5: Start MLflow Server
+
+Now that the network is properly configured, start the MLflow server:
+
+```bash
+# SSH into the MLflow VM and run the prepared script
+gcloud compute ssh mlflow-server --zone=us-central1-a --command="sudo /opt/mlflow/run_mlflow.sh"
+
+# Verify the connection to the database
+gcloud compute ssh mlflow-server --zone=us-central1-a --command="PGPASSWORD='$DB_PASSWORD' psql -h $DB_HOST -U $DB_USER -d $DB_NAME -c '\conninfo'"
+
+# Verify MLflow is running
+gcloud compute ssh mlflow-server --zone=us-central1-a --command="ps aux | grep mlflow && netstat -tuln | grep 5000"
+```
+
+If you encounter issues:
+
+```bash
+# SSH into the MLflow VM for troubleshooting
+gcloud compute ssh mlflow-server --zone=us-central1-a
+
+# Check logs
+sudo cat /var/log/startup-script.log
+cat /opt/mlflow/flowers_classification_app/mlflow.log
+
+# Manually start MLflow if needed
+sudo /opt/mlflow/run_mlflow.sh
+```
+
+### Step 6: Get the MLflow Server External IP
 
 ```bash
 MLFLOW_IP=$(gcloud compute instances describe mlflow-server --zone=us-central1-a --format='get(networkInterfaces[0].accessConfigs[0].natIP)')
@@ -188,7 +241,7 @@ echo "MLflow server is available at: http://$MLFLOW_IP:5000"
 export MLFLOW_TRACKING_URI="http://$MLFLOW_IP:5000"
 ```
 
-### Step 5: Set Up Environment Security (Optional but Recommended)
+### Step 7: Set Up Environment Security (Optional but Recommended)
 
 For production, store sensitive connection information in Secret Manager:
 
