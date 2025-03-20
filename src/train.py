@@ -129,7 +129,9 @@ class Trainer:
             "classifier": self.model.classifier
         }
         torch.save(checkpoint, self.save_directory)
-        print(f"Checkpoint saved to {self.save_directory}")
+        logger.info(f"Checkpoint saved to {self.save_directory}")
+        
+        return self.save_directory
 
 if __name__ == "__main__":
     # Configure MLflow tracking URI from environment variable or use default
@@ -145,10 +147,20 @@ if __name__ == "__main__":
     print('===================== Data Preparation Started! =====================')
     #Data preprocessing
     try:
-        data_preparation = dp.DataPreparation(
-            data_dir=in_arg.data_directory,
-            download_url='https://drive.google.com/uc?export=download&id=18I2XurHF94K072w4rM3uwVjwFpP_7Dnz'
-        )
+        # Check if using Google Cloud Storage
+        if hasattr(in_arg, 'bucket_name') and in_arg.bucket_name:
+            logger.info(f"Using Google Cloud Storage bucket: {in_arg.bucket_name}")
+            data_preparation = dp.DataPreparation(
+                data_dir=in_arg.data_directory,
+                download_url='https://drive.google.com/uc?export=download&id=18I2XurHF94K072w4rM3uwVjwFpP_7Dnz',
+                bucket_name=in_arg.bucket_name
+            )
+        else:
+            logger.info("Using local storage only")
+            data_preparation = dp.DataPreparation(
+                data_dir=in_arg.data_directory,
+                download_url='https://drive.google.com/uc?export=download&id=18I2XurHF94K072w4rM3uwVjwFpP_7Dnz'
+            )
     except Exception as e:
         logger.error(f"Error initializing data preparation: {e}")
         sys.exit(1)
@@ -219,7 +231,19 @@ if __name__ == "__main__":
             pytorch_model=trainer.model,
             artifact_path=f"model_{in_arg.arch}_{in_arg.learning_rate}_{in_arg.hidden_units}"
         )
-        trainer.save_checkpoint(in_arg.epochs, class_to_idx=trainloader.dataset.class_to_idx)
+        checkpoint_path = trainer.save_checkpoint(in_arg.epochs, class_to_idx=trainloader.dataset.class_to_idx)
+        
+        # Upload checkpoint to GCS if using a bucket
+        if hasattr(in_arg, 'bucket_name') and in_arg.bucket_name:
+            try:
+                from utils.gcs_utils import upload_to_gcs
+                # Create GCS path
+                gcs_path = f"gs://{in_arg.bucket_name}/{checkpoint_path}"
+                logger.info(f"Uploading checkpoint to {gcs_path}")
+                upload_to_gcs(checkpoint_path, gcs_path)
+                logger.info(f"Successfully uploaded checkpoint to GCS")
+            except Exception as e:
+                logger.error(f"Error uploading checkpoint to GCS: {e}")
         
         print(f"MLflow Run ID: {run.info.run_id}")
         mlflow.end_run()

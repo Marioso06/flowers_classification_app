@@ -35,6 +35,8 @@ def get_input_args():
 
     parser.add_argument('--learning_rate', type=float, default=config["learning_rate"], help='Learning rate for training')
 
+    parser.add_argument('--bucket_name', type=str, default=config.get("bucket_name", None), help='Google Cloud Storage bucket name')
+
     parser.add_argument('--epochs', type=int, default=config["epochs"], help='Number of training epochs')
 
     parser.add_argument('--print_every', type=int, default=config["print_every"], help='Print training accuracy every N steps')

@@ -6,3 +6,12 @@ dvc==3.59.0
 dvc-gdrive==3.0.1
 mlflow==2.20.2
 Flask==3.1.0
+
+# Cloud Storage Integration
+google-cloud-storage>=2.10.0
+
+# Database Integration
+psycopg2-binary>=2.9.9  # PostgreSQL connector
+
+# For production deployment
+gunicorn>=21.2.0

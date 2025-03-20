@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 import json
 import base64
 import logging
+import tempfile
 from PIL import Image
 from io import BytesIO
 from datetime import datetime
@@ -12,6 +13,22 @@ from torchvision import models
 from src.utils.arg_parser import get_input_args
 from src.utils.image_normalization import process_image, imshow
 from flask import Flask, jsonify, request
+
+# Check if Google Cloud Storage utilities are available
+try:
+    from src.utils.gcs_utils import is_gcs_path, download_from_gcs, parse_gcs_path
+    HAS_GCS_SUPPORT = True
+except ImportError:
+    logging.warning("Google Cloud Storage utilities not available. GCS features will be disabled.")
+    HAS_GCS_SUPPORT = False
+
+# Check if MLflow is available for model loading
+try:
+    import mlflow.pyfunc
+    HAS_MLFLOW_SUPPORT = True
+except ImportError:
+    logging.warning("MLflow not available. MLflow features will be disabled.")
+    HAS_MLFLOW_SUPPORT = False
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
@@ -24,6 +41,24 @@ PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__)))
 # Use environment variables with defaults for configuration
 CAT_NAMES_PATH = os.environ.get('CAT_NAMES_PATH', os.path.join(PROJECT_ROOT, "configs/cat_to_name.json"))
 MODELS_DIR = os.environ.get('MODELS_DIR', os.path.join(PROJECT_ROOT, "models"))
+
+# GCS configuration
+GCS_BUCKET = os.environ.get('GCS_BUCKET', None)  # Set this in your environment or docker-compose
+if GCS_BUCKET and HAS_GCS_SUPPORT:
+    logger.info(f"Google Cloud Storage bucket configured: {GCS_BUCKET}")
+else:
+    logger.info("Using local storage only for model files")
+
+# MLflow configuration
+MLFLOW_TRACKING_URI = os.environ.get('MLFLOW_TRACKING_URI', 'http://localhost:5000')
+USE_MLFLOW_MODELS = os.environ.get('USE_MLFLOW_MODELS', 'false').lower() in ('true', '1', 'yes')
+
+if HAS_MLFLOW_SUPPORT and USE_MLFLOW_MODELS:
+    logger.info(f"MLflow configured with tracking URI: {MLFLOW_TRACKING_URI}")
+    mlflow.set_tracking_uri(MLFLOW_TRACKING_URI)
+    logger.info("MLflow model loading enabled")
+else:
+    logger.info("Using direct model loading (not using MLflow)")
 
 # Log the configuration
 logger.info(f"Project root: {PROJECT_ROOT}")
@@ -55,13 +90,30 @@ def process_base64_image(base64_image):
 
 def load_checkpoint(checkpoint_path):
     try:
+        # Check if path is a GCS path and download if needed
+        local_checkpoint_path = checkpoint_path
+        if HAS_GCS_SUPPORT and is_gcs_path(checkpoint_path):
+            logger.info(f"Downloading checkpoint from GCS: {checkpoint_path}")
+            # Create a temporary file to download the checkpoint
+            with tempfile.NamedTemporaryFile(delete=False, suffix='.pth') as temp_file:
+                local_checkpoint_path = temp_file.name
+            
+            # Download the checkpoint from GCS
+            download_from_gcs(checkpoint_path, local_checkpoint_path)
+            logger.info(f"Downloaded checkpoint to {local_checkpoint_path}")
+        
         # Load the checkpoint with CPU mapping for CUDA tensors
         device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         logger.info(f"Loading checkpoint using device: {device}")
         
         # Use map_location to handle models saved on CUDA devices
         # Set weights_only=False to handle PyTorch 2.6+ security changes
-        checkpoint = torch.load(checkpoint_path, map_location=device, weights_only=False)
+        checkpoint = torch.load(local_checkpoint_path, map_location=device, weights_only=False)
+        
+        # Clean up temporary file if we downloaded from GCS
+        if local_checkpoint_path != checkpoint_path and HAS_GCS_SUPPORT and is_gcs_path(checkpoint_path):
+            os.remove(local_checkpoint_path)
+            logger.info(f"Removed temporary checkpoint file: {local_checkpoint_path}")
         
         architecture = checkpoint.get("architecture", "vgg13")
         logger.info(f"Model architecture: {architecture}")
@@ -94,21 +146,69 @@ def load_checkpoint(checkpoint_path):
         logger.error(f"Error loading checkpoint: {e}")
         return None
 
+# Function to load model from MLflow if enabled
+def load_model_from_mlflow(run_id, model_name="PyTorchModel"):
+    if not HAS_MLFLOW_SUPPORT:
+        logger.warning("MLflow support not available. Cannot load model from MLflow.")
+        return None
+    
+    try:
+        logger.info(f"Loading model from MLflow run: {run_id}, model name: {model_name}")
+        model = mlflow.pytorch.load_model(f"runs:/{run_id}/{model_name}")
+        return model
+    except Exception as e:
+        logger.error(f"Error loading model from MLflow: {e}")
+        return None
+
+# Function to get model path (local or GCS)
+def get_model_path(model_name):
+    # First check local path
+    local_path = os.path.join(MODELS_DIR, model_name)
+    if os.path.exists(local_path):
+        return local_path
+    
+    # If not found locally and GCS is configured, check GCS
+    if HAS_GCS_SUPPORT and GCS_BUCKET:
+        gcs_path = f"gs://{GCS_BUCKET}/models/{model_name}"
+        return gcs_path
+    
+    # Default to local path if GCS not available
+    return local_path
+
 # Load models with error handling for containerized environment
 try:
-    model_v1_path = os.path.join(MODELS_DIR, "model_checkpoint_v1.pth")
-    logger.info(f"Loading model v1 from {model_v1_path}")
-    model_v1 = load_checkpoint(model_v1_path)
-    if model_v1 is None:
-        logger.error(f"Failed to load model v1 from {model_v1_path}")
-    else:
-        logger.info(f"Model v1 loaded successfully")
+    # Check if we should use MLflow for model loading
+    if HAS_MLFLOW_SUPPORT and USE_MLFLOW_MODELS:
+        # MLflow run IDs for model versions (would be set via environment variables in production)
+        MLFLOW_RUN_ID_V1 = os.environ.get('MLFLOW_RUN_ID_V1', None)
+        MLFLOW_RUN_ID_V2 = os.environ.get('MLFLOW_RUN_ID_V2', None)
         
-    model_v2_path = os.path.join(MODELS_DIR, "model_checkpoint_v2.pth")
-    logger.info(f"Loading model v2 from {model_v2_path}")
-    model_v2 = load_checkpoint(model_v2_path)
+        if MLFLOW_RUN_ID_V1:
+            logger.info(f"Loading model v1 from MLflow run: {MLFLOW_RUN_ID_V1}")
+            model_v1 = load_model_from_mlflow(MLFLOW_RUN_ID_V1)
+        else:
+            logger.warning("No MLflow run ID for model v1. Falling back to direct checkpoint loading.")
+            model_v1_path = get_model_path("model_checkpoint_v1.pth")
+    # Only try to load model_v1 if we haven't already loaded it from MLflow
+    if not (HAS_MLFLOW_SUPPORT and USE_MLFLOW_MODELS and MLFLOW_RUN_ID_V1 and 'model_v1' in locals()):
+        logger.info(f"Loading model v1 from {model_v1_path}")
+        model_v1 = load_checkpoint(model_v1_path)
+        if model_v1 is None:
+            logger.error(f"Failed to load model v1 from {model_v1_path}")
+        else:
+            logger.info(f"Model v1 loaded successfully")
+    
+    # Load model_v2 from MLflow if possible, otherwise from checkpoint
+    if HAS_MLFLOW_SUPPORT and USE_MLFLOW_MODELS and MLFLOW_RUN_ID_V2:
+        logger.info(f"Loading model v2 from MLflow run: {MLFLOW_RUN_ID_V2}")
+        model_v2 = load_model_from_mlflow(MLFLOW_RUN_ID_V2)
+    else:
+        model_v2_path = get_model_path("model_checkpoint_v2.pth")
+        logger.info(f"Loading model v2 from {model_v2_path}")
+        model_v2 = load_checkpoint(model_v2_path)
+    
     if model_v2 is None:
-        logger.error(f"Failed to load model v2 from {model_v2_path}")
+        logger.error(f"Failed to load model v2")
     else:
         logger.info(f"Model v2 loaded successfully")
 except Exception as e:
