@@ -292,10 +292,6 @@ gcloud compute instances create flowers-training-vm \
     git checkout lab_cloud_gcp
     # Set up Python environment
     make init-cpu
-
-    # Install additional dependencies
-    pip install google-cloud-storage
-    pip install mlflow==2.20.2 psycopg2-binary
     
     echo "Setup complete. Ready for training!"'
 ```
