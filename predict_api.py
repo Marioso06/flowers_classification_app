@@ -22,6 +22,14 @@ except ImportError:
     logging.warning("Google Cloud Storage utilities not available. GCS features will be disabled.")
     HAS_GCS_SUPPORT = False
 
+# Check if Amazon S3 utilities are available
+try:
+    from src.utils.s3_utils import is_s3_path, download_from_s3, parse_s3_path
+    HAS_S3_SUPPORT = True
+except ImportError:
+    logging.warning("Amazon S3 utilities not available. S3 features will be disabled.")
+    HAS_S3_SUPPORT = False
+
 # Check if MLflow is available for model loading
 try:
     import mlflow.pyfunc
@@ -42,10 +50,14 @@ PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__)))
 CAT_NAMES_PATH = os.environ.get('CAT_NAMES_PATH', os.path.join(PROJECT_ROOT, "configs/cat_to_name.json"))
 MODELS_DIR = os.environ.get('MODELS_DIR', os.path.join(PROJECT_ROOT, "models"))
 
-# GCS configuration
+# Cloud storage configuration
 GCS_BUCKET = os.environ.get('GCS_BUCKET', None)  # Set this in your environment or docker-compose
+AWS_S3_BUCKET = os.environ.get('AWS_S3_BUCKET_NAME', None)  # Set this in your environment or docker-compose
+
 if GCS_BUCKET and HAS_GCS_SUPPORT:
     logger.info(f"Google Cloud Storage bucket configured: {GCS_BUCKET}")
+elif AWS_S3_BUCKET and HAS_S3_SUPPORT:
+    logger.info(f"Amazon S3 bucket configured: {AWS_S3_BUCKET}")
 else:
     logger.info("Using local storage only for model files")
 
@@ -90,8 +102,10 @@ def process_base64_image(base64_image):
 
 def load_checkpoint(checkpoint_path):
     try:
-        # Check if path is a GCS path and download if needed
+        # Check if path is a GCS or S3 path and download if needed
         local_checkpoint_path = checkpoint_path
+        
+        # Handle GCS path
         if HAS_GCS_SUPPORT and is_gcs_path(checkpoint_path):
             logger.info(f"Downloading checkpoint from GCS: {checkpoint_path}")
             # Create a temporary file to download the checkpoint
@@ -102,6 +116,17 @@ def load_checkpoint(checkpoint_path):
             download_from_gcs(checkpoint_path, local_checkpoint_path)
             logger.info(f"Downloaded checkpoint to {local_checkpoint_path}")
         
+        # Handle S3 path
+        elif HAS_S3_SUPPORT and is_s3_path(checkpoint_path):
+            logger.info(f"Downloading checkpoint from S3: {checkpoint_path}")
+            # Create a temporary file to download the checkpoint
+            with tempfile.NamedTemporaryFile(delete=False, suffix='.pth') as temp_file:
+                local_checkpoint_path = temp_file.name
+            
+            # Download the checkpoint from S3
+            download_from_s3(checkpoint_path, local_checkpoint_path)
+            logger.info(f"Downloaded checkpoint to {local_checkpoint_path}")
+        
         # Load the checkpoint with CPU mapping for CUDA tensors
         device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         logger.info(f"Loading checkpoint using device: {device}")
@@ -110,10 +135,11 @@ def load_checkpoint(checkpoint_path):
         # Set weights_only=False to handle PyTorch 2.6+ security changes
         checkpoint = torch.load(local_checkpoint_path, map_location=device, weights_only=False)
         
-        # Clean up temporary file if we downloaded from GCS
-        if local_checkpoint_path != checkpoint_path and HAS_GCS_SUPPORT and is_gcs_path(checkpoint_path):
-            os.remove(local_checkpoint_path)
-            logger.info(f"Removed temporary checkpoint file: {local_checkpoint_path}")
+        # Clean up temporary file if we downloaded from cloud storage
+        if local_checkpoint_path != checkpoint_path:
+            if (HAS_GCS_SUPPORT and is_gcs_path(checkpoint_path)) or (HAS_S3_SUPPORT and is_s3_path(checkpoint_path)):
+                os.remove(local_checkpoint_path)
+                logger.info(f"Removed temporary checkpoint file: {local_checkpoint_path}")
         
         architecture = checkpoint.get("architecture", "vgg13")
         logger.info(f"Model architecture: {architecture}")
@@ -160,7 +186,7 @@ def load_model_from_mlflow(run_id, model_name="PyTorchModel"):
         logger.error(f"Error loading model from MLflow: {e}")
         return None
 
-# Function to get model path (local or GCS)
+# Function to get model path (local, GCS, or S3)
 def get_model_path(model_name):
     # First check local path
     local_path = os.path.join(MODELS_DIR, model_name)
@@ -172,7 +198,12 @@ def get_model_path(model_name):
         gcs_path = f"gs://{GCS_BUCKET}/models/{model_name}"
         return gcs_path
     
-    # Default to local path if GCS not available
+    # If not found locally and S3 is configured, check S3
+    if HAS_S3_SUPPORT and AWS_S3_BUCKET:
+        s3_path = f"s3://{AWS_S3_BUCKET}/models/{model_name}"
+        return s3_path
+    
+    # Default to local path if cloud storage not available
     return local_path
 
 # Load models with error handling for containerized environment

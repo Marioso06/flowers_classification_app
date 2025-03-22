@@ -12,8 +12,19 @@ try:
     from configs.gcp_config import GCP_BUCKET_NAME, MLFLOW_ARTIFACTS_PATH, MLFLOW_DB_URI
     HAS_GCP_CONFIG = True
 except ImportError:
-    logger.warning("GCP configuration not found. Using local storage for MLflow.")
+    logger.warning("GCP configuration not found.")
     HAS_GCP_CONFIG = False
+
+# Try to import AWS configuration
+try:
+    from configs.aws_config import AWS_S3_BUCKET_NAME, MLFLOW_ARTIFACTS_PATH as AWS_MLFLOW_ARTIFACTS_PATH, MLFLOW_DB_URI as AWS_MLFLOW_DB_URI
+    HAS_AWS_CONFIG = True
+except ImportError:
+    logger.warning("AWS configuration not found.")
+    HAS_AWS_CONFIG = False
+
+if not (HAS_GCP_CONFIG or HAS_AWS_CONFIG):
+    logger.warning("Neither GCP nor AWS configuration found. Using local storage for MLflow.")
     
 # Try to import database libraries (required for PostgreSQL)
 try:
@@ -60,6 +71,11 @@ def parse_arguments():
         action="store_true",
         help="Use Google Cloud Storage for artifact storage."
     )
+    parser.add_argument(
+        "--use-s3",
+        action="store_true",
+        help="Use Amazon S3 for artifact storage."
+    )
     return parser.parse_args()
 
 def start_mlflow_server(args):
@@ -83,6 +99,12 @@ def start_mlflow_server(args):
         bucket_name = os.environ.get('BUCKET_NAME', GCP_BUCKET_NAME)
         artifact_location = f"gs://{bucket_name}/{MLFLOW_ARTIFACTS_PATH}"
         logger.info(f"Using Google Cloud Storage for MLflow artifacts: {artifact_location}")
+    # Check if S3 should be used
+    elif args.use_s3 and HAS_AWS_CONFIG:
+        # Use the bucket from AWS config
+        bucket_name = os.environ.get('AWS_S3_BUCKET_NAME', AWS_S3_BUCKET_NAME)
+        artifact_location = f"s3://{bucket_name}/{AWS_MLFLOW_ARTIFACTS_PATH}"
+        logger.info(f"Using Amazon S3 for MLflow artifacts: {artifact_location}")
     elif args.artifact_store:
         # Use explicitly provided artifact store
         artifact_location = args.artifact_store
@@ -124,6 +146,9 @@ def main():
     
     if 'USE_GCS_FOR_MLFLOW' in os.environ and os.environ['USE_GCS_FOR_MLFLOW'].lower() in ('true', '1', 'yes'):
         args.use_gcs = True
+    
+    if 'USE_S3_FOR_MLFLOW' in os.environ and os.environ['USE_S3_FOR_MLFLOW'].lower() in ('true', '1', 'yes'):
+        args.use_s3 = True
         
     if 'USE_POSTGRES_FOR_MLFLOW' in os.environ and os.environ['USE_POSTGRES_FOR_MLFLOW'].lower() in ('true', '1', 'yes'):
         args.use_postgres = True

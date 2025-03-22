@@ -9,6 +9,7 @@ Flask
 
 # Cloud Storage Integration
 google-cloud-storage
+boto3
 
 # Database Integration
 psycopg2-binary
