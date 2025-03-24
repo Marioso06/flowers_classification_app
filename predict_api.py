@@ -1,3 +1,4 @@
+#Importing all the required libraries
 import torch
 import os
 import numpy as np
@@ -276,9 +277,12 @@ def predict_v2():
             "error": str(e)
         }), 500
 
+
+# Main function
 if __name__ == "__main__":
     # Get host and port from environment variables or use defaults
     host = os.environ.get('FLASK_HOST', '0.0.0.0')  # Use 0.0.0.0 to listen on all interfaces in container
+    #Initialising a port for MLops
     port = int(os.environ.get('FLASK_PORT', 9000))
     debug = os.environ.get('FLASK_DEBUG', 'False').lower() == 'true'
     
