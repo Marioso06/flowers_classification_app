@@ -5,6 +5,8 @@ import matplotlib.pyplot as plt
 import json
 import base64
 import logging
+import time
+import psutil
 from PIL import Image
 from io import BytesIO
 from datetime import datetime
@@ -12,12 +14,23 @@ from torchvision import models
 from src.utils.arg_parser import get_input_args
 from src.utils.image_normalization import process_image, imshow
 from flask import Flask, jsonify, request
+from prometheus_flask_exporter import PrometheusMetrics
+from prometheus_client import Counter, Histogram, Gauge
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
+
+# Initialize Prometheus metrics
+metrics = PrometheusMetrics(app)
+
+# Custom metrics
+prediction_requests = Counter('model_prediction_requests_total', 'Total number of prediction requests', ['model_version'])
+prediction_time = Histogram('model_prediction_duration_seconds', 'Time spent processing prediction', ['model_version'])
+memory_usage = Gauge('app_memory_usage_bytes', 'Memory usage of the application')
+cpu_usage = Gauge('app_cpu_usage_percent', 'CPU usage percentage of the application')
 
 PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__)))
 
@@ -212,6 +225,13 @@ def helth_check():
 def predict_v1():
     logger.info("Received prediction request for model v1")
     
+    # Increment prediction request counter
+    prediction_requests.labels(model_version="v1").inc()
+    
+    # Update resource metrics
+    memory_usage.set(psutil.Process(os.getpid()).memory_info().rss)  # Resident Set Size in bytes
+    cpu_usage.set(psutil.Process(os.getpid()).cpu_percent(interval=None))
+    
     if not request.is_json:
         logger.warning("Request does not contain JSON data")
         return jsonify({"error": "Request must contain JSON data"}), 400
@@ -233,7 +253,11 @@ def predict_v1():
     try:
         logger.info(f"Processing image for prediction with top_k={top_k}")
         np_image = process_base64_image(base64_image)
+        
+        # Time the prediction
+        start_time = time.time()
         results = predict(np_image, model_v1, top_k)
+        prediction_time.labels(model_version="v1").observe(time.time() - start_time)
         
         logger.info("Prediction successful")
         return jsonify({
@@ -250,21 +274,43 @@ def predict_v1():
 
 @app.route('/v2/predict', methods=['POST'])
 def predict_v2():
+    logger.info("Received prediction request for model v2")
+    
+    # Increment prediction request counter
+    prediction_requests.labels(model_version="v2").inc()
+    
+    # Update resource metrics
+    memory_usage.set(psutil.Process(os.getpid()).memory_info().rss)
+    cpu_usage.set(psutil.Process(os.getpid()).cpu_percent(interval=None))
+    
     if not request.is_json:
+        logger.warning("Request does not contain JSON data")
         return jsonify({"error": "Request must contain JSON data"}), 400
     
     data = request.json
 
     if 'image_data' not in data:
+        logger.warning("Missing required field: image_data")
         return jsonify({"error": "Missing required field: image_data"}), 400
     
     base64_image = data['image_data']
     top_k = data.get('top_k', 5)
     
+    # Check if model is loaded
+    if model_v2 is None:
+        logger.error("Model v2 is not loaded")
+        return jsonify({"error": "Model v2 is not available"}), 503
+    
     try:
+        logger.info(f"Processing image for prediction with top_k={top_k}")
         np_image = process_base64_image(base64_image)
-        results = predict(np_image, model_v2, top_k)
         
+        # Time the prediction
+        start_time = time.time()
+        results = predict(np_image, model_v2, top_k)
+        prediction_time.labels(model_version="v2").observe(time.time() - start_time)
+        
+        logger.info("Prediction successful")
         return jsonify({
             "success": True,
             "prediction": results
@@ -276,7 +322,26 @@ def predict_v2():
             "error": str(e)
         }), 500
 
+def monitor_resources():
+    """Background thread function to monitor resource usage"""
+    while True:
+        try:
+            # Update memory and CPU metrics
+            process = psutil.Process(os.getpid())
+            memory_usage.set(process.memory_info().rss)  # Resident Set Size in bytes
+            cpu_usage.set(process.cpu_percent(interval=1.0))
+            time.sleep(15)  # Update every 15 seconds
+        except Exception as e:
+            logger.error(f"Error in resource monitoring thread: {e}")
+            time.sleep(60)  # Retry after a minute if there was an error
+
 if __name__ == "__main__":
+    # Start resource monitoring in a background thread
+    import threading
+    monitor_thread = threading.Thread(target=monitor_resources, daemon=True)
+    monitor_thread.start()
+    logger.info("Resource monitoring thread started")
+    
     # Get host and port from environment variables or use defaults
     host = os.environ.get('FLASK_HOST', '0.0.0.0')  # Use 0.0.0.0 to listen on all interfaces in container
     port = int(os.environ.get('FLASK_PORT', 9000))

@@ -29,10 +29,51 @@ services:
     networks:
       - flowers-network
 
+  prometheus:
+    image: prom/prometheus:latest
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus:/etc/prometheus
+      - prometheus-data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--web.enable-lifecycle'
+    # Add extra_hosts to allow accessing host machine from container
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    networks:
+      - flowers-network
+    depends_on:
+      - app
+
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=password
+      - GF_USERS_ALLOW_SIGN_UP=false
+    volumes:
+      - ./grafana/provisioning:/etc/grafana/provisioning
+      - grafana-data:/var/lib/grafana
+    networks:
+      - flowers-network
+    depends_on:
+      - prometheus
+
 networks:
   flowers-network:
     driver: bridge
 
 volumes:
   mlflow-data:
+    driver: local
+  prometheus-data:
+    driver: local
+  grafana-data:
     driver: local
