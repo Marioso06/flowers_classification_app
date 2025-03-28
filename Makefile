@@ -39,6 +39,7 @@ init-amd-wsl:
 	cp /opt/rocm/lib/libhsa-runtime64.so.1.2 libhsa-runtime64.so
 
 	@echo "Setup complete! Run 'source $(VENV)/bin/activate' to activate the environment."
+	source $(VENV)/bin/activate
 
 # Create virtual environment this is for AMD GPUs
 init-amd-linux:
@@ -57,6 +58,7 @@ init-amd-linux:
 	@echo "Finishing up setting up ROCm for Pytorch..."
 
 	@echo "Setup complete! Run 'source $(VENV)/bin/activate' to activate the environment."
+	source $(VENV)/bin/activate
 
 #Create virtual enviroment this is for CPU - General usage
 init-cpu:
@@ -73,6 +75,7 @@ init-cpu:
 	$(PIP) install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu
 
 	@echo "Setup complete! Run 'source $(VENV)/bin/activate' to activate the environment."
+	source $(VENV)/bin/activate
 
 #Create virtual enviroment - this if for Nvidia GPU
 init-gpu:
@@ -89,6 +92,7 @@ init-gpu:
 	$(PIP) torch torchvision torchaudio
 
 	@echo "Setup complete! Run 'source $(VENV)/bin/activate' to activate the environment."
+	source $(VENV)/bin/activate
 
 #Create virtual enviroment 
 init-mac:
@@ -105,6 +109,7 @@ init-mac:
 	$(PIP) install torch==2.5.1 torchvision==0.20.1 torchaudio==2.5.1
 
 	@echo "Setup complete! Run 'source $(VENV)/bin/activate' to activate the environment."
+	source $(VENV)/bin/activate
 
 # MLFlow Initialization
 mlflow-init:
