@@ -1,0 +1,13 @@
+mlruns/
+.flower_classification/
+.vscode/
+data/
+__pycache__/
+
+.gitignore/
+Makefile/
+Dockerfile/
+.git/
+
+predicts/
+models/

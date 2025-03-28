@@ -46,9 +46,10 @@ def process_base64_image(base64_image):
 def load_checkpoint(checkpoint_path):
     try:
         # Load the checkpoint
-        checkpoint = torch.load(checkpoint_path)
-        
-        checkpoint = torch.load(checkpoint_path)
+        device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+
+        checkpoint = torch.load(checkpoint_path, map_location=device, weights_only=False)
+
         architecture = checkpoint.get("architecture", "vgg13")
         if architecture == "vgg11":
             model = models.vgg11(weights=None)  # Weights=None, since we’ll load ours
@@ -78,8 +79,15 @@ def load_checkpoint(checkpoint_path):
         print(f"Error loading checkpoint: {e}")
         return None
 
-model_v1 = load_checkpoint(os.path.join(MODELS_DIR, "model_checkpoint_v1.pth"))
-model_v2 = load_checkpoint(os.path.join(MODELS_DIR, "model_checkpoint_v2.pth"))
+try:
+    model_v1_path = (os.path.join(MODELS_DIR, "model_checkpoint_v1.pth"))
+    model_v1 = load_checkpoint(model_v1_path)
+
+    model_v2_path = (MODELS_DIR, "model_checkpoint_v2.pth")
+    model_v2 = load_checkpoint(os.path.join(model_v2_path))
+
+except Exception as e:
+    print(f"Error loading models: {e}")
 
 
 def predict(image_data, model, top_k=5):

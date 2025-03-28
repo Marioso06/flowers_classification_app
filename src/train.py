@@ -126,9 +126,12 @@ class Trainer:
         print(f"Checkpoint saved to {self.save_directory}")
 
 if __name__ == "__main__":
+    mlflow_tracking_uri = os.environ.get('MLFLOW_TRACKING_URI', 'http://localhost:5000')
+
     mlflow.pytorch.autolog()
     mlflow.set_experiment("Flowers Classification App")
-    mlflow.set_tracking_uri("http://localhost:8080")
+    mlflow.set_tracking_uri(mlflow_tracking_uri)
+    
     file_path = 'data/raw.dvc'
     in_arg = get_input_args()
     print('===================== Data Preparation Started! =====================')

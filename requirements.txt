@@ -4,5 +4,4 @@ PyYAML==6.0.2
 gdown==5.2.0
 dvc==3.59.0
 dvc-gdrive==3.0.1
-mlflow==2.20.2
 Flask==3.1.0
