@@ -1,11 +1,17 @@
 import torch
 import os
+import sys
+import logging
 import data_processing as dp
 import mlflow
 import mlflow.pytorch
 import yaml
 from utils.model_configuration import ModelConfiguration as mc
 from utils.arg_parser import get_input_args
+
+# Configure logging
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+logger = logging.getLogger(__name__)
 
 class Trainer:
     def __init__(
@@ -126,21 +132,35 @@ class Trainer:
         print(f"Checkpoint saved to {self.save_directory}")
 
 if __name__ == "__main__":
+    # Configure MLflow tracking URI from environment variable or use default
+    mlflow_tracking_uri = os.environ.get('MLFLOW_TRACKING_URI', 'http://localhost:5000')
+    logger.info(f"Using MLflow tracking URI: {mlflow_tracking_uri}")
+    
     mlflow.pytorch.autolog()
+    mlflow.set_tracking_uri(mlflow_tracking_uri)
     mlflow.set_experiment("Flowers Classification App")
-    mlflow.set_tracking_uri("http://localhost:8080")
+    
     file_path = 'data/raw.dvc'
     in_arg = get_input_args()
     print('===================== Data Preparation Started! =====================')
     #Data preprocessing
-    data_preparation = dp.DataPreparation(
-        data_dir=in_arg.data_directory,
-        download_url='https://drive.google.com/uc?export=download&id=18I2XurHF94K072w4rM3uwVjwFpP_7Dnz'
-    )
+    try:
+        data_preparation = dp.DataPreparation(
+            data_dir=in_arg.data_directory,
+            download_url='https://drive.google.com/uc?export=download&id=18I2XurHF94K072w4rM3uwVjwFpP_7Dnz'
+        )
+    except Exception as e:
+        logger.error(f"Error initializing data preparation: {e}")
+        sys.exit(1)
 
-    data_preparation.prepare_data()
-    print(in_arg.data_directory)
-    trainloader, testloader, validloader = data_preparation.transform_data()
+    try:
+        data_preparation.prepare_data()
+        logger.info(f"Using data directory: {in_arg.data_directory}")
+        trainloader, testloader, validloader = data_preparation.transform_data()
+        logger.info("Data transformation complete")
+    except Exception as e:
+        logger.error(f"Error during data preparation: {e}")
+        sys.exit(1)
     
     print('===================== Data Preparation Finished! =====================')
     
@@ -159,11 +179,18 @@ if __name__ == "__main__":
         dataset_md5 = "data_not_tracked"
     
     #Load and Get pre-trained configured model
-    model_config = mc(in_arg.freeze_parameters, in_arg.arch, in_arg.learning_rate, in_arg.hidden_units, in_arg.dropout, in_arg.training_compute)
-    model, optimizer, criterion = model_config.get_model_and_optimizer()
+    try:
+        logger.info(f"Configuring model with architecture {in_arg.arch}, learning rate {in_arg.learning_rate}, hidden units {in_arg.hidden_units}")
+        model_config = mc(in_arg.freeze_parameters, in_arg.arch, in_arg.learning_rate, in_arg.hidden_units, in_arg.dropout, in_arg.training_compute)
+        model, optimizer, criterion = model_config.get_model_and_optimizer()
+        logger.info(f"Model configured successfully using {model_config.device}")
+    except Exception as e:
+        logger.error(f"Error configuring model: {e}")
+        sys.exit(1)
 
     #Initilize training
     save_directory = f"{in_arg.save_dir}/{in_arg.save_name}"
+    logger.info(f"Model will be saved to {save_directory}")
     trainer = Trainer(model, criterion, optimizer, model_config.device, 
                       trainloader, validloader, testloader, in_arg.epochs, 
                       in_arg.print_every, save_directory,
