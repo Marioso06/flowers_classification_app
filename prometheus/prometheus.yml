@@ -1,0 +1,30 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+scrape_configs:
+  - job_name: 'flowers-api'
+    scrape_interval: 5s
+    static_configs:
+      - targets: ['app:9000']
+
+  # MLflow doesn't natively expose Prometheus metrics
+  # To monitor MLflow, we would need to add an exporter
+  #- job_name: 'mlflow'
+  #  scrape_interval: 10s
+  #  static_configs:
+  #    - targets: ['mlflow:5000']
+
+  - job_name: 'prometheus'
+    scrape_interval: 10s
+    static_configs:
+      - targets: ['localhost:9090']
+      
+  - job_name: 'model-training'
+    scrape_interval: 5s
+    static_configs:
+      - targets:
+        - 'training-metrics:8002'
+    metrics_path: /metrics
+    scheme: http
+    scrape_timeout: 3s

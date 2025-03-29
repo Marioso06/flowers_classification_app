@@ -1,0 +1,554 @@
+2025-03-26 18:52:36,113 - __main__ - INFO - ================================================================================
+2025-03-26 18:52:36,113 - __main__ - INFO - Starting API Stress Test at 2025-03-26 18:52:36
+2025-03-26 18:52:36,113 - __main__ - INFO - API Endpoint: http://localhost:9000
+2025-03-26 18:52:36,113 - __main__ - INFO - Test Images Directory: /home/mario-linux/flowers_classification_app/tests/archive/test_images
+2025-03-26 18:52:36,113 - __main__ - INFO - Concurrent Requests: 10
+2025-03-26 18:52:36,113 - __main__ - INFO - Samples per Class: 20
+2025-03-26 18:52:36,113 - __main__ - INFO - ================================================================================
+2025-03-26 18:52:36,113 - __main__ - INFO - 
+Testing V1 API Endpoint...
+2025-03-26 18:52:36,120 - __main__ - INFO - Processing 497 images from 'rose' (class index: 74)
+2025-03-26 18:52:36,219 - __main__ - WARNING - API request failed with status 500: {"error":"[Errno 2] No such file or directory: '/app/temp_image.jpg'","success":false}
+
+2025-03-26 18:52:36,816 - __main__ - WARNING - API request failed with status 500: {"error":"[Errno 2] No such file or directory: '/app/temp_image.jpg'","success":false}
+
+2025-03-26 18:52:37,102 - __main__ - WARNING - API request failed with status 500: {"error":"cannot identify image file '/app/temp_image.jpg'","success":false}
+
+2025-03-26 18:52:37,431 - __main__ - WARNING - API request failed with status 500: {"error":"[Errno 2] No such file or directory: '/app/temp_image.jpg'","success":false}
+
+2025-03-26 18:52:37,435 - __main__ - WARNING - API request failed with status 500: {"error":"[Errno 2] No such file or directory: '/app/temp_image.jpg'","success":false}
+
+2025-03-26 18:52:37,441 - __main__ - WARNING - API request failed with status 500: {"error":"[Errno 2] No such file or directory: '/app/temp_image.jpg'","success":false}
+
+2025-03-26 18:52:37,513 - __main__ - WARNING - API request failed with status 500: {"error":"cannot identify image file '/app/temp_image.jpg'","success":false}
+
+2025-03-26 18:52:38,073 - __main__ - WARNING - API request failed with status 500: {"error":"image file is truncated (33 bytes not processed)","success":false}
+
+2025-03-26 18:52:38,085 - __main__ - WARNING - API request failed with status 500: {"error":"cannot identify image file '/app/temp_image.jpg'","success":false}
+
+2025-03-26 18:52:38,107 - __main__ - WARNING - API request failed with status 500: {"error":"[Errno 2] No such file or directory: '/app/temp_image.jpg'","success":false}
+
+2025-03-26 18:52:38,139 - __main__ - WARNING - API request failed with status 500: {"error":"cannot identify image file '/app/temp_image.jpg'","success":false}
+
+2025-03-26 18:52:38,316 - __main__ - WARNING - API request failed with status 500: {"error":"cannot identify image file '/app/temp_image.jpg'","success":false}
+
+2025-03-26 18:52:38,320 - __main__ - WARNING - API request failed with status 500: {"error":"cannot identify image file '/app/temp_image.jpg'","success":false}
+
+2025-03-26 18:52:38,374 - __main__ - WARNING - API request failed with status 500: {"error":"cannot identify image file '/app/temp_image.jpg'","success":false}
+
+2025-03-26 18:52:38,919 - __main__ - WARNING - API request failed with status 500: {"error":"cannot identify image file '/app/temp_image.jpg'","success":false}
+
+2025-03-26 18:52:39,663 - __main__ - WARNING - API request failed with status 500: {"error":"[Errno 2] No such file or directory: '/app/temp_image.jpg'","success":false}
+
+2025-03-26 18:52:39,736 - __main__ - WARNING - API request failed with status 500: {"error":"cannot identify image file '/app/temp_image.jpg'","success":false}
+
+2025-03-26 18:52:39,821 - __main__ - WARNING - API request failed with status 500: {"error":"cannot identify image file '/app/temp_image.jpg'","success":false}
+
+2025-03-26 18:52:39,828 - __main__ - WARNING - API request failed with status 500: {"error":"[Errno 2] No such file or directory: '/app/temp_image.jpg'","success":false}
+
+2025-03-26 18:52:39,912 - __main__ - WARNING - API request failed with status 500: {"error":"[Errno 2] No such file or directory: '/app/temp_image.jpg'","success":false}
+
+2025-03-26 18:52:39,965 - __main__ - WARNING - API request failed with status 500: {"error":"[Errno 2] No such file or directory: '/app/temp_image.jpg'","success":false}
+
+2025-03-26 18:52:40,040 - __main__ - WARNING - API request failed with status 500: {"error":"[Errno 2] No such file or directory: '/app/temp_image.jpg'","success":false}
+
+2025-03-26 18:52:40,113 - __main__ - WARNING - API request failed with status 500: {"error":"cannot identify image file '/app/temp_image.jpg'","success":false}
+
+2025-03-26 18:52:40,249 - __main__ - WARNING - API request failed with status 500: {"error":"[Errno 2] No such file or directory: '/app/temp_image.jpg'","success":false}
+
+2025-03-26 18:52:40,256 - __main__ - WARNING - API request failed with status 500: {"error":"[Errno 2] No such file or directory: '/app/temp_image.jpg'","success":false}
+
+2025-03-26 18:52:40,917 - __main__ - WARNING - API request failed with status 500: {"error":"cannot identify image file '/app/temp_image.jpg'","success":false}
+
+2025-03-26 18:52:41,549 - __main__ - WARNING - API request failed with status 500: {"error":"[Errno 2] No such file or directory: '/app/temp_image.jpg'","success":false}
+
+2025-03-26 18:52:41,691 - __main__ - WARNING - API request failed with status 500: {"error":"cannot identify image file '/app/temp_image.jpg'","success":false}
+
+2025-03-26 18:52:41,723 - __main__ - WARNING - API request failed with status 500: {"error":"[Errno 2] No such file or directory: '/app/temp_image.jpg'","success":false}
+
+2025-03-26 18:52:41,777 - __main__ - WARNING - API request failed with status 500: {"error":"[Errno 2] No such file or directory: '/app/temp_image.jpg'","success":false}
+
+2025-03-26 18:52:41,855 - __main__ - WARNING - API request failed with status 500: {"error":"[Errno 2] No such file or directory: '/app/temp_image.jpg'","success":false}
+
+2025-03-26 18:52:41,939 - __main__ - WARNING - API request failed with status 500: {"error":"[Errno 2] No such file or directory: '/app/temp_image.jpg'","success":false}
+
+2025-03-26 18:52:42,011 - __main__ - WARNING - API request failed with status 500: {"error":"cannot identify image file '/app/temp_image.jpg'","success":false}
+
+2025-03-26 18:52:42,045 - __main__ - WARNING - API request failed with status 500: {"error":"[Errno 2] No such file or directory: '/app/temp_image.jpg'","success":false}
+
+2025-03-26 18:52:42,047 - __main__ - WARNING - API request failed with status 500: {"error":"[Errno 2] No such file or directory: '/app/temp_image.jpg'","success":false}
+
+2025-03-26 18:52:42,244 - __main__ - WARNING - API request failed with status 500: {"error":"[Errno 2] No such file or directory: '/app/temp_image.jpg'","success":false}
+
+2025-03-26 18:52:43,338 - __main__ - WARNING - API request failed with status 500: {"error":"[Errno 2] No such file or directory: '/app/temp_image.jpg'","success":false}
+
+2025-03-26 18:52:43,447 - __main__ - WARNING - API request failed with status 500: {"error":"image file is truncated (13 bytes not processed)","success":false}
+
+2025-03-26 18:52:44,340 - __main__ - WARNING - API request failed with status 500: {"error":"[Errno 2] No such file or directory: '/app/temp_image.jpg'","success":false}
+
+2025-03-26 18:52:44,492 - __main__ - WARNING - API request failed with status 500: {"error":"cannot identify image file '/app/temp_image.jpg'","success":false}
+
+2025-03-26 18:52:45,663 - __main__ - WARNING - API request failed with status 500: {"error":"[Errno 2] No such file or directory: '/app/temp_image.jpg'","success":false}
+
+2025-03-26 18:52:46,957 - __main__ - WARNING - API request failed with status 500: {"error":"image file is truncated (20 bytes not processed)","success":false}
+
+2025-03-26 18:52:47,456 - __main__ - WARNING - API request failed with status 500: {"error":"cannot identify image file '/app/temp_image.jpg'","success":false}
+
+2025-03-26 18:52:47,497 - __main__ - WARNING - API request failed with status 500: {"error":"image file is truncated (53 bytes not processed)","success":false}
+
+2025-03-26 18:52:47,768 - __main__ - WARNING - API request failed with status 500: {"error":"[Errno 2] No such file or directory: '/app/temp_image.jpg'","success":false}
+
+2025-03-26 18:52:48,006 - __main__ - WARNING - API request failed with status 500: {"error":"[Errno 2] No such file or directory: '/app/temp_image.jpg'","success":false}
+
+2025-03-26 18:52:48,560 - __main__ - WARNING - API request failed with status 500: {"error":"cannot identify image file '/app/temp_image.jpg'","success":false}
+
+2025-03-26 18:52:49,326 - __main__ - WARNING - API request failed with status 500: {"error":"[Errno 2] No such file or directory: '/app/temp_image.jpg'","success":false}
+
+2025-03-26 18:52:49,598 - __main__ - WARNING - API request failed with status 500: {"error":"[Errno 2] No such file or directory: '/app/temp_image.jpg'","success":false}
+
+2025-03-26 18:52:50,532 - __main__ - WARNING - API request failed with status 500: {"error":"[Errno 2] No such file or directory: '/app/temp_image.jpg'","success":false}
+
+2025-03-26 18:52:50,606 - __main__ - WARNING - API request failed with status 500: {"error":"image file is truncated (27 bytes not processed)","success":false}
+
+2025-03-26 18:52:50,731 - __main__ - WARNING - API request failed with status 500: {"error":"image file is truncated (40 bytes not processed)","success":false}
+
+2025-03-26 18:52:50,830 - __main__ - WARNING - API request failed with status 500: {"error":"[Errno 2] No such file or directory: '/app/temp_image.jpg'","success":false}
+
+2025-03-26 18:52:51,998 - __main__ - WARNING - API request failed with status 500: {"error":"[Errno 2] No such file or directory: '/app/temp_image.jpg'","success":false}
+
+2025-03-26 18:52:52,498 - __main__ - WARNING - API request failed with status 500: {"error":"cannot identify image file '/app/temp_image.jpg'","success":false}
+
+2025-03-26 18:52:52,542 - __main__ - WARNING - API request failed with status 500: {"error":"cannot identify image file '/app/temp_image.jpg'","success":false}
+
+2025-03-26 18:52:52,643 - __main__ - WARNING - API request failed with status 500: {"error":"[Errno 2] No such file or directory: '/app/temp_image.jpg'","success":false}
+
+2025-03-26 18:52:53,872 - __main__ - WARNING - API request failed with status 500: {"error":"[Errno 2] No such file or directory: '/app/temp_image.jpg'","success":false}
+
+2025-03-26 18:52:54,094 - __main__ - WARNING - API request failed with status 500: {"error":"[Errno 2] No such file or directory: '/app/temp_image.jpg'","success":false}
+
+2025-03-26 18:52:54,096 - __main__ - WARNING - API request failed with status 500: {"error":"[Errno 2] No such file or directory: '/app/temp_image.jpg'","success":false}
+
+2025-03-26 18:52:54,158 - __main__ - WARNING - API request failed with status 500: {"error":"cannot identify image file '/app/temp_image.jpg'","success":false}
+
+2025-03-26 18:52:54,323 - __main__ - WARNING - API request failed with status 500: {"error":"[Errno 2] No such file or directory: '/app/temp_image.jpg'","success":false}
+
+2025-03-26 18:52:54,535 - __main__ - WARNING - API request failed with status 500: {"error":"[Errno 2] No such file or directory: '/app/temp_image.jpg'","success":false}
+
+2025-03-26 18:52:54,774 - __main__ - WARNING - API request failed with status 500: {"error":"cannot identify image file '/app/temp_image.jpg'","success":false}
+
+2025-03-26 18:52:55,625 - __main__ - WARNING - API request failed with status 500: {"error":"[Errno 2] No such file or directory: '/app/temp_image.jpg'","success":false}
+
+2025-03-26 18:52:57,947 - __main__ - INFO - Processing 646 images from 'dandelion' (class index: unknown)
+2025-03-26 18:52:58,077 - __main__ - WARNING - API request failed with status 500: {"error":"cannot identify image file '/app/temp_image.jpg'","success":false}
+
+2025-03-26 18:52:58,081 - __main__ - WARNING - API request failed with status 500: {"error":"[Errno 2] No such file or directory: '/app/temp_image.jpg'","success":false}
+
+2025-03-26 18:52:58,144 - __main__ - WARNING - API request failed with status 500: {"error":"cannot identify image file '/app/temp_image.jpg'","success":false}
+
+2025-03-26 18:52:58,145 - __main__ - WARNING - API request failed with status 500: {"error":"cannot identify image file '/app/temp_image.jpg'","success":false}
+
+2025-03-26 18:52:58,276 - __main__ - WARNING - API request failed with status 500: {"error":"cannot identify image file '/app/temp_image.jpg'","success":false}
+
+2025-03-26 18:52:58,286 - __main__ - WARNING - API request failed with status 500: {"error":"cannot identify image file '/app/temp_image.jpg'","success":false}
+
+2025-03-26 18:52:58,758 - __main__ - WARNING - API request failed with status 500: {"error":"[Errno 2] No such file or directory: '/app/temp_image.jpg'","success":false}
+
+2025-03-26 18:52:58,840 - __main__ - WARNING - API request failed with status 500: {"error":"[Errno 2] No such file or directory: '/app/temp_image.jpg'","success":false}
+
+2025-03-26 18:52:58,969 - __main__ - WARNING - API request failed with status 500: {"error":"[Errno 2] No such file or directory: '/app/temp_image.jpg'","success":false}
+
+2025-03-26 18:52:59,032 - __main__ - WARNING - API request failed with status 500: {"error":"cannot identify image file '/app/temp_image.jpg'","success":false}
+
+2025-03-26 18:53:00,053 - __main__ - WARNING - API request failed with status 500: {"error":"[Errno 2] No such file or directory: '/app/temp_image.jpg'","success":false}
+
+2025-03-26 18:53:00,104 - __main__ - WARNING - API request failed with status 500: {"error":"[Errno 2] No such file or directory: '/app/temp_image.jpg'","success":false}
+
+2025-03-26 18:53:00,868 - __main__ - WARNING - API request failed with status 500: {"error":"cannot identify image file '/app/temp_image.jpg'","success":false}
+
+2025-03-26 18:53:00,878 - __main__ - WARNING - API request failed with status 500: {"error":"cannot identify image file '/app/temp_image.jpg'","success":false}
+
+2025-03-26 18:53:00,925 - __main__ - WARNING - API request failed with status 500: {"error":"cannot identify image file '/app/temp_image.jpg'","success":false}
+
+2025-03-26 18:53:00,959 - __main__ - WARNING - API request failed with status 500: {"error":"[Errno 2] No such file or directory: '/app/temp_image.jpg'","success":false}
+
+2025-03-26 18:53:01,026 - __main__ - WARNING - API request failed with status 500: {"error":"[Errno 2] No such file or directory: '/app/temp_image.jpg'","success":false}
+
+2025-03-26 18:53:01,667 - __main__ - WARNING - API request failed with status 500: {"error":"[Errno 2] No such file or directory: '/app/temp_image.jpg'","success":false}
+
+2025-03-26 18:53:02,358 - __main__ - WARNING - API request failed with status 500: {"error":"cannot identify image file '/app/temp_image.jpg'","success":false}
+
+2025-03-26 18:53:02,474 - __main__ - WARNING - API request failed with status 500: {"error":"[Errno 2] No such file or directory: '/app/temp_image.jpg'","success":false}
+
+2025-03-26 18:53:02,936 - __main__ - WARNING - API request failed with status 500: {"error":"[Errno 2] No such file or directory: '/app/temp_image.jpg'","success":false}
+
+2025-03-26 18:53:02,937 - __main__ - WARNING - API request failed with status 500: {"error":"cannot identify image file '/app/temp_image.jpg'","success":false}
+
+2025-03-26 18:53:03,229 - __main__ - WARNING - API request failed with status 500: {"error":"image file is truncated (77 bytes not processed)","success":false}
+
+2025-03-26 18:53:03,259 - __main__ - WARNING - API request failed with status 500: {"error":"[Errno 2] No such file or directory: '/app/temp_image.jpg'","success":false}
+
+2025-03-26 18:53:03,309 - __main__ - WARNING - API request failed with status 500: {"error":"[Errno 2] No such file or directory: '/app/temp_image.jpg'","success":false}
+
+2025-03-26 18:53:04,521 - __main__ - WARNING - API request failed with status 500: {"error":"[Errno 2] No such file or directory: '/app/temp_image.jpg'","success":false}
+
+2025-03-26 18:53:04,530 - __main__ - WARNING - API request failed with status 500: {"error":"cannot identify image file '/app/temp_image.jpg'","success":false}
+
+2025-03-26 18:53:05,449 - __main__ - WARNING - API request failed with status 500: {"error":"cannot identify image file '/app/temp_image.jpg'","success":false}
+
+2025-03-26 18:53:06,421 - __main__ - WARNING - API request failed with status 500: {"error":"[Errno 2] No such file or directory: '/app/temp_image.jpg'","success":false}
+
+2025-03-26 18:53:06,425 - __main__ - WARNING - API request failed with status 500: {"error":"[Errno 2] No such file or directory: '/app/temp_image.jpg'","success":false}
+
+2025-03-26 18:53:06,474 - __main__ - WARNING - API request failed with status 500: {"error":"cannot identify image file '/app/temp_image.jpg'","success":false}
+
+2025-03-26 18:53:06,827 - __main__ - WARNING - API request failed with status 500: {"error":"cannot identify image file '/app/temp_image.jpg'","success":false}
+
+2025-03-26 18:53:09,192 - __main__ - WARNING - API request failed with status 500: {"error":"[Errno 2] No such file or directory: '/app/temp_image.jpg'","success":false}
+
+2025-03-26 18:53:09,771 - __main__ - WARNING - API request failed with status 500: {"error":"cannot identify image file '/app/temp_image.jpg'","success":false}
+
+2025-03-26 18:53:09,844 - __main__ - WARNING - API request failed with status 500: {"error":"[Errno 2] No such file or directory: '/app/temp_image.jpg'","success":false}
+
+2025-03-26 18:53:09,894 - __main__ - WARNING - API request failed with status 500: {"error":"cannot identify image file '/app/temp_image.jpg'","success":false}
+
+2025-03-26 18:53:10,034 - __main__ - WARNING - API request failed with status 500: {"error":"[Errno 2] No such file or directory: '/app/temp_image.jpg'","success":false}
+
+2025-03-26 18:53:10,094 - __main__ - WARNING - API request failed with status 500: {"error":"[Errno 2] No such file or directory: '/app/temp_image.jpg'","success":false}
+
+2025-03-26 18:53:10,222 - __main__ - WARNING - API request failed with status 500: {"error":"[Errno 2] No such file or directory: '/app/temp_image.jpg'","success":false}
+
+2025-03-26 18:53:10,611 - __main__ - WARNING - API request failed with status 500: {"error":"[Errno 2] No such file or directory: '/app/temp_image.jpg'","success":false}
+
+2025-03-26 18:53:10,618 - __main__ - WARNING - API request failed with status 500: {"error":"[Errno 2] No such file or directory: '/app/temp_image.jpg'","success":false}
+
+2025-03-26 18:53:10,707 - __main__ - WARNING - API request failed with status 500: {"error":"[Errno 2] No such file or directory: '/app/temp_image.jpg'","success":false}
+
+2025-03-26 18:53:10,772 - __main__ - WARNING - API request failed with status 500: {"error":"cannot identify image file '/app/temp_image.jpg'","success":false}
+
+2025-03-26 18:53:10,823 - __main__ - WARNING - API request failed with status 500: {"error":"cannot identify image file '/app/temp_image.jpg'","success":false}
+
+2025-03-26 18:53:10,824 - __main__ - WARNING - API request failed with status 500: {"error":"[Errno 2] No such file or directory: '/app/temp_image.jpg'","success":false}
+
+2025-03-26 18:53:10,883 - __main__ - WARNING - API request failed with status 500: {"error":"cannot identify image file '/app/temp_image.jpg'","success":false}
+
+2025-03-26 18:53:11,578 - __main__ - WARNING - API request failed with status 500: {"error":"cannot identify image file '/app/temp_image.jpg'","success":false}
+
+2025-03-26 18:53:11,630 - __main__ - WARNING - API request failed with status 500: {"error":"[Errno 2] No such file or directory: '/app/temp_image.jpg'","success":false}
+
+2025-03-26 18:53:11,664 - __main__ - WARNING - API request failed with status 500: {"error":"cannot identify image file '/app/temp_image.jpg'","success":false}
+
+2025-03-26 18:53:11,719 - __main__ - WARNING - API request failed with status 500: {"error":"cannot identify image file '/app/temp_image.jpg'","success":false}
+
+2025-03-26 18:53:11,879 - __main__ - WARNING - API request failed with status 500: {"error":"[Errno 2] No such file or directory: '/app/temp_image.jpg'","success":false}
+
+2025-03-26 18:53:12,262 - __main__ - WARNING - API request failed with status 500: {"error":"cannot identify image file '/app/temp_image.jpg'","success":false}
+
+2025-03-26 18:53:12,268 - __main__ - WARNING - API request failed with status 500: {"error":"cannot identify image file '/app/temp_image.jpg'","success":false}
+
+2025-03-26 18:53:12,539 - __main__ - WARNING - API request failed with status 500: {"error":"[Errno 2] No such file or directory: '/app/temp_image.jpg'","success":false}
+
+2025-03-26 18:53:13,278 - __main__ - WARNING - API request failed with status 500: {"error":"image file is truncated (1 bytes not processed)","success":false}
+
+2025-03-26 18:53:13,286 - __main__ - WARNING - API request failed with status 500: {"error":"[Errno 2] No such file or directory: '/app/temp_image.jpg'","success":false}
+
+2025-03-26 18:53:13,374 - __main__ - WARNING - API request failed with status 500: {"error":"[Errno 2] No such file or directory: '/app/temp_image.jpg'","success":false}
+
+2025-03-26 18:53:13,428 - __main__ - WARNING - API request failed with status 500: {"error":"[Errno 2] No such file or directory: '/app/temp_image.jpg'","success":false}
+
+2025-03-26 18:53:13,512 - __main__ - WARNING - API request failed with status 500: {"error":"[Errno 2] No such file or directory: '/app/temp_image.jpg'","success":false}
+
+2025-03-26 18:53:13,584 - __main__ - WARNING - API request failed with status 500: {"error":"[Errno 2] No such file or directory: '/app/temp_image.jpg'","success":false}
+
+2025-03-26 18:53:13,816 - __main__ - WARNING - API request failed with status 500: {"error":"[Errno 2] No such file or directory: '/app/temp_image.jpg'","success":false}
+
+2025-03-26 18:53:14,585 - __main__ - WARNING - API request failed with status 500: {"error":"cannot identify image file '/app/temp_image.jpg'","success":false}
+
+2025-03-26 18:53:15,587 - __main__ - WARNING - API request failed with status 500: {"error":"[Errno 2] No such file or directory: '/app/temp_image.jpg'","success":false}
+
+2025-03-26 18:53:16,071 - __main__ - WARNING - API request failed with status 500: {"error":"[Errno 2] No such file or directory: '/app/temp_image.jpg'","success":false}
+
+2025-03-26 18:53:16,698 - __main__ - WARNING - API request failed with status 500: {"error":"cannot identify image file '/app/temp_image.jpg'","success":false}
+
+2025-03-26 18:53:16,839 - __main__ - WARNING - API request failed with status 500: {"error":"cannot identify image file '/app/temp_image.jpg'","success":false}
+
+2025-03-26 18:53:16,919 - __main__ - WARNING - API request failed with status 500: {"error":"[Errno 2] No such file or directory: '/app/temp_image.jpg'","success":false}
+
+2025-03-26 18:53:17,182 - __main__ - WARNING - API request failed with status 500: {"error":"[Errno 2] No such file or directory: '/app/temp_image.jpg'","success":false}
+
+2025-03-26 18:53:17,779 - __main__ - WARNING - API request failed with status 500: {"error":"[Errno 2] No such file or directory: '/app/temp_image.jpg'","success":false}
+
+2025-03-26 18:53:18,075 - __main__ - WARNING - API request failed with status 500: {"error":"[Errno 2] No such file or directory: '/app/temp_image.jpg'","success":false}
+
+2025-03-26 18:53:18,127 - __main__ - WARNING - API request failed with status 500: {"error":"cannot identify image file '/app/temp_image.jpg'","success":false}
+
+2025-03-26 18:53:18,753 - __main__ - WARNING - API request failed with status 500: {"error":"image file is truncated (20 bytes not processed)","success":false}
+
+2025-03-26 18:53:19,438 - __main__ - WARNING - API request failed with status 500: {"error":"[Errno 2] No such file or directory: '/app/temp_image.jpg'","success":false}
+
+2025-03-26 18:53:19,630 - __main__ - WARNING - API request failed with status 500: {"error":"[Errno 2] No such file or directory: '/app/temp_image.jpg'","success":false}
+
+2025-03-26 18:53:19,896 - __main__ - WARNING - API request failed with status 500: {"error":"[Errno 2] No such file or directory: '/app/temp_image.jpg'","success":false}
+
+2025-03-26 18:53:20,023 - __main__ - WARNING - API request failed with status 500: {"error":"[Errno 2] No such file or directory: '/app/temp_image.jpg'","success":false}
+
+2025-03-26 18:53:20,330 - __main__ - WARNING - API request failed with status 500: {"error":"[Errno 2] No such file or directory: '/app/temp_image.jpg'","success":false}
+
+2025-03-26 18:53:20,379 - __main__ - WARNING - API request failed with status 500: {"error":"[Errno 2] No such file or directory: '/app/temp_image.jpg'","success":false}
+
+2025-03-26 18:53:20,860 - __main__ - WARNING - API request failed with status 500: {"error":"[Errno 2] No such file or directory: '/app/temp_image.jpg'","success":false}
+
+2025-03-26 18:53:21,390 - __main__ - WARNING - API request failed with status 500: {"error":"[Errno 2] No such file or directory: '/app/temp_image.jpg'","success":false}
+
+2025-03-26 18:53:21,608 - __main__ - WARNING - API request failed with status 500: {"error":"[Errno 2] No such file or directory: '/app/temp_image.jpg'","success":false}
+
+2025-03-26 18:53:22,337 - __main__ - WARNING - API request failed with status 500: {"error":"image file is truncated (7 bytes not processed)","success":false}
+
+2025-03-26 18:53:22,373 - __main__ - WARNING - API request failed with status 500: {"error":"[Errno 2] No such file or directory: '/app/temp_image.jpg'","success":false}
+
+2025-03-26 18:53:22,429 - __main__ - WARNING - API request failed with status 500: {"error":"[Errno 2] No such file or directory: '/app/temp_image.jpg'","success":false}
+
+2025-03-26 18:53:22,592 - __main__ - WARNING - API request failed with status 500: {"error":"cannot identify image file '/app/temp_image.jpg'","success":false}
+
+2025-03-26 18:53:22,613 - __main__ - WARNING - API request failed with status 500: {"error":"[Errno 2] No such file or directory: '/app/temp_image.jpg'","success":false}
+
+2025-03-26 18:53:22,927 - __main__ - WARNING - API request failed with status 500: {"error":"image file is truncated (93 bytes not processed)","success":false}
+
+2025-03-26 18:59:03,463 - __main__ - INFO - ================================================================================
+2025-03-26 18:59:03,463 - __main__ - INFO - Starting API Stress Test at 2025-03-26 18:59:03
+2025-03-26 18:59:03,463 - __main__ - INFO - API Endpoint: http://localhost:9000
+2025-03-26 18:59:03,463 - __main__ - INFO - Test Images Directory: /home/mario-linux/flowers_classification_app/tests/archive/test_images
+2025-03-26 18:59:03,463 - __main__ - INFO - Concurrent Requests: 2
+2025-03-26 18:59:03,463 - __main__ - INFO - Samples per Class: All
+2025-03-26 18:59:03,464 - __main__ - INFO - Max Images per Folder: 3
+2025-03-26 18:59:03,464 - __main__ - INFO - Request Delay: 0.5 seconds
+2025-03-26 18:59:03,464 - __main__ - INFO - ================================================================================
+2025-03-26 18:59:03,464 - __main__ - INFO - 
+Testing V1 API Endpoint...
+2025-03-26 18:59:03,466 - __main__ - INFO - Limiting to 3 images out of 497 in folder rose
+2025-03-26 18:59:03,467 - __main__ - INFO - Processing 3 images from 'rose' (class index: 74)
+2025-03-26 18:59:04,737 - __main__ - INFO - Limiting to 3 images out of 646 in folder dandelion
+2025-03-26 18:59:04,737 - __main__ - INFO - Processing 3 images from 'dandelion' (class index: unknown)
+2025-03-26 18:59:05,979 - __main__ - INFO - Limiting to 3 images out of 495 in folder sunflower
+2025-03-26 18:59:05,979 - __main__ - INFO - Processing 3 images from 'sunflower' (class index: 54)
+2025-03-26 18:59:06,497 - __main__ - WARNING - API request failed with status 500: {"error":"[Errno 2] No such file or directory: '/app/temp_image.jpg'","success":false}
+
+2025-03-26 18:59:07,074 - __main__ - INFO - Limiting to 3 images out of 607 in folder tulip
+2025-03-26 18:59:07,074 - __main__ - INFO - Processing 3 images from 'tulip' (class index: unknown)
+2025-03-26 18:59:08,316 - __main__ - INFO - Limiting to 3 images out of 501 in folder daisy
+2025-03-26 18:59:08,317 - __main__ - INFO - Processing 3 images from 'daisy' (class index: unknown)
+2025-03-26 18:59:09,566 - __main__ - INFO - V1 API Test completed with 15 requests
+2025-03-26 18:59:09,566 - __main__ - INFO - Analyzing V1 API results...
+2025-03-26 18:59:09,569 - __main__ - INFO - 
+============================================================
+2025-03-26 18:59:09,570 - __main__ - INFO - API STRESS TEST RESULTS SUMMARY
+2025-03-26 18:59:09,570 - __main__ - INFO - ============================================================
+2025-03-26 18:59:09,570 - __main__ - INFO - Total Requests: 15
+2025-03-26 18:59:09,570 - __main__ - INFO - Successful Requests: 14 (93.33%)
+2025-03-26 18:59:09,570 - __main__ - INFO - Failed Requests: 1 (6.67%)
+2025-03-26 18:59:09,570 - __main__ - INFO - Accuracy: 7.14%
+2025-03-26 18:59:09,570 - __main__ - INFO - Mean Response Time: 0.119 seconds
+2025-03-26 18:59:09,570 - __main__ - INFO - Median Response Time: 0.161 seconds
+2025-03-26 18:59:09,571 - __main__ - INFO - 95th Percentile Response Time: 0.173 seconds
+2025-03-26 18:59:09,571 - __main__ - INFO - Min/Max Response Time: 0.013/0.175 seconds
+2025-03-26 18:59:09,571 - __main__ - INFO - ============================================================
+2025-03-26 18:59:10,002 - __main__ - INFO - Results visualization saved to results/v1/stress_test_results.png
+2025-03-26 18:59:10,004 - __main__ - INFO - Detailed results saved to results/v1/stress_test_results.csv
+2025-03-26 18:59:10,004 - __main__ - INFO - 
+================================================================================
+2025-03-26 18:59:10,004 - __main__ - INFO - API Stress Test Completed in 6.54 seconds
+2025-03-26 18:59:10,004 - __main__ - INFO - ================================================================================
+2025-03-26 19:00:22,703 - __main__ - DEBUG - Debug logging enabled
+2025-03-26 19:00:22,703 - __main__ - INFO - ================================================================================
+2025-03-26 19:00:22,703 - __main__ - INFO - Starting API Stress Test at 2025-03-26 19:00:22
+2025-03-26 19:00:22,703 - __main__ - INFO - API Endpoint: http://localhost:9000
+2025-03-26 19:00:22,703 - __main__ - INFO - Test Images Directory: /home/mario-linux/flowers_classification_app/tests/archive/test_images
+2025-03-26 19:00:22,703 - __main__ - INFO - Concurrent Requests: 1
+2025-03-26 19:00:22,703 - __main__ - INFO - Samples per Class: All
+2025-03-26 19:00:22,703 - __main__ - INFO - Max Images per Folder: 2
+2025-03-26 19:00:22,704 - __main__ - INFO - Request Delay: 1.0 seconds
+2025-03-26 19:00:22,704 - __main__ - INFO - ================================================================================
+2025-03-26 19:00:22,704 - __main__ - INFO - 
+Testing V1 API Endpoint...
+2025-03-26 19:00:22,706 - __main__ - INFO - Limiting to 2 images out of 497 in folder rose
+2025-03-26 19:00:22,706 - __main__ - INFO - Processing 2 images from 'rose' (class index: 74)
+2025-03-26 19:00:22,720 - __main__ - DEBUG - Successfully encoded image /home/mario-linux/flowers_classification_app/tests/archive/test_images/rose/6969041818_a505baa68e_m.jpg to base64 (length: 21504)
+2025-03-26 19:00:23,721 - __main__ - DEBUG - Sending image with base64 length 21504 to /v1/predict
+2025-03-26 19:00:23,803 - __main__ - DEBUG - Successfully encoded image /home/mario-linux/flowers_classification_app/tests/archive/test_images/rose/8125886145_ae99f91fd0.jpg to base64 (length: 35052)
+2025-03-26 19:00:24,804 - __main__ - DEBUG - Sending image with base64 length 35052 to /v1/predict
+2025-03-26 19:00:24,882 - __main__ - INFO - Limiting to 2 images out of 646 in folder dandelion
+2025-03-26 19:00:24,882 - __main__ - INFO - Processing 2 images from 'dandelion' (class index: unknown)
+2025-03-26 19:00:24,885 - __main__ - DEBUG - Successfully encoded image /home/mario-linux/flowers_classification_app/tests/archive/test_images/dandelion/8978962053_0727b41d26.jpg to base64 (length: 25480)
+2025-03-26 19:00:25,886 - __main__ - DEBUG - Sending image with base64 length 25480 to /v1/predict
+2025-03-26 19:00:25,964 - __main__ - DEBUG - Successfully encoded image /home/mario-linux/flowers_classification_app/tests/archive/test_images/dandelion/16699732794_5bfd639cf8_n.jpg to base64 (length: 36108)
+2025-03-26 19:00:26,964 - __main__ - DEBUG - Sending image with base64 length 36108 to /v1/predict
+2025-03-26 19:00:27,040 - __main__ - INFO - Limiting to 2 images out of 495 in folder sunflower
+2025-03-26 19:00:27,040 - __main__ - INFO - Processing 2 images from 'sunflower' (class index: 54)
+2025-03-26 19:00:27,043 - __main__ - DEBUG - Successfully encoded image /home/mario-linux/flowers_classification_app/tests/archive/test_images/sunflower/5917253022_4e3142d48b_n.jpg to base64 (length: 10072)
+2025-03-26 19:00:28,044 - __main__ - DEBUG - Sending image with base64 length 10072 to /v1/predict
+2025-03-26 19:00:28,124 - __main__ - DEBUG - Successfully encoded image /home/mario-linux/flowers_classification_app/tests/archive/test_images/sunflower/5492906452_80943bfd04.jpg to base64 (length: 86916)
+2025-03-26 19:00:29,125 - __main__ - DEBUG - Sending image with base64 length 86916 to /v1/predict
+2025-03-26 19:00:29,207 - __main__ - INFO - Limiting to 2 images out of 607 in folder tulip
+2025-03-26 19:00:29,208 - __main__ - INFO - Processing 2 images from 'tulip' (class index: unknown)
+2025-03-26 19:00:29,209 - __main__ - DEBUG - Successfully encoded image /home/mario-linux/flowers_classification_app/tests/archive/test_images/tulip/5665080897_0796f726c9_m.jpg to base64 (length: 7260)
+2025-03-26 19:00:30,210 - __main__ - DEBUG - Sending image with base64 length 7260 to /v1/predict
+2025-03-26 19:00:30,291 - __main__ - DEBUG - Successfully encoded image /home/mario-linux/flowers_classification_app/tests/archive/test_images/tulip/10163955604_ae0b830975_n.jpg to base64 (length: 43452)
+2025-03-26 19:00:31,293 - __main__ - DEBUG - Sending image with base64 length 43452 to /v1/predict
+2025-03-26 19:00:31,368 - __main__ - INFO - Limiting to 2 images out of 501 in folder daisy
+2025-03-26 19:00:31,369 - __main__ - INFO - Processing 2 images from 'daisy' (class index: unknown)
+2025-03-26 19:00:31,372 - __main__ - DEBUG - Successfully encoded image /home/mario-linux/flowers_classification_app/tests/archive/test_images/daisy/2551708158_1f10e81e11.jpg to base64 (length: 29680)
+2025-03-26 19:00:32,373 - __main__ - DEBUG - Sending image with base64 length 29680 to /v1/predict
+2025-03-26 19:00:32,450 - __main__ - DEBUG - Successfully encoded image /home/mario-linux/flowers_classification_app/tests/archive/test_images/daisy/18023717391_e2c9089e10.jpg to base64 (length: 55628)
+2025-03-26 19:00:34,112 - __main__ - DEBUG - Sending image with base64 length 55628 to /v1/predict
+2025-03-26 19:00:34,184 - __main__ - INFO - V1 API Test completed with 10 requests
+2025-03-26 19:00:34,184 - __main__ - INFO - Analyzing V1 API results...
+2025-03-26 19:00:34,187 - __main__ - INFO - 
+============================================================
+2025-03-26 19:00:34,187 - __main__ - INFO - API STRESS TEST RESULTS SUMMARY
+2025-03-26 19:00:34,188 - __main__ - INFO - ============================================================
+2025-03-26 19:00:34,188 - __main__ - INFO - Total Requests: 10
+2025-03-26 19:00:34,188 - __main__ - INFO - Successful Requests: 10 (100.00%)
+2025-03-26 19:00:34,188 - __main__ - INFO - Failed Requests: 0 (0.00%)
+2025-03-26 19:00:34,188 - __main__ - INFO - Accuracy: 10.00%
+2025-03-26 19:00:34,188 - __main__ - INFO - Mean Response Time: 0.075 seconds
+2025-03-26 19:00:34,188 - __main__ - INFO - Median Response Time: 0.074 seconds
+2025-03-26 19:00:34,188 - __main__ - INFO - 95th Percentile Response Time: 0.078 seconds
+2025-03-26 19:00:34,188 - __main__ - INFO - Min/Max Response Time: 0.071/0.079 seconds
+2025-03-26 19:00:34,189 - __main__ - INFO - ============================================================
+2025-03-26 19:00:34,588 - __main__ - INFO - Results visualization saved to results/v1/stress_test_results.png
+2025-03-26 19:00:34,590 - __main__ - INFO - Detailed results saved to results/v1/stress_test_results.csv
+2025-03-26 19:00:34,590 - __main__ - INFO - 
+================================================================================
+2025-03-26 19:00:34,590 - __main__ - INFO - API Stress Test Completed in 11.89 seconds
+2025-03-26 19:00:34,590 - __main__ - INFO - ================================================================================
+2025-03-26 19:05:32,047 - __main__ - DEBUG - Debug logging enabled
+2025-03-26 19:05:32,047 - __main__ - INFO - ================================================================================
+2025-03-26 19:05:32,048 - __main__ - INFO - Starting API Stress Test at 2025-03-26 19:05:32
+2025-03-26 19:05:32,048 - __main__ - INFO - API Endpoint: http://localhost:9000
+2025-03-26 19:05:32,048 - __main__ - INFO - Test Images Directory: /home/mario-linux/flowers_classification_app/tests/archive/test_images
+2025-03-26 19:05:32,048 - __main__ - INFO - Concurrent Requests: 2
+2025-03-26 19:05:32,048 - __main__ - INFO - Samples per Class: All
+2025-03-26 19:05:32,048 - __main__ - INFO - Max Images per Folder: 5
+2025-03-26 19:05:32,048 - __main__ - INFO - Request Delay: 0.0 seconds
+2025-03-26 19:05:32,048 - __main__ - INFO - ================================================================================
+2025-03-26 19:05:32,048 - __main__ - INFO - 
+Testing V1 API Endpoint...
+2025-03-26 19:05:32,051 - __main__ - INFO - Limiting to 5 images out of 497 in folder rose
+2025-03-26 19:05:32,051 - __main__ - INFO - Processing 5 images from 'rose' (class index: 74)
+2025-03-26 19:05:32,062 - __main__ - DEBUG - Successfully encoded image /home/mario-linux/flowers_classification_app/tests/archive/test_images/rose/16666836810_216f50e9c3_m.jpg to base64 (length: 20804)
+2025-03-26 19:05:32,062 - __main__ - DEBUG - Sending image with base64 length 20804 to /v1/predict
+2025-03-26 19:05:32,064 - __main__ - DEBUG - Successfully encoded image /home/mario-linux/flowers_classification_app/tests/archive/test_images/rose/16155980245_6ab8d7b888.jpg to base64 (length: 26948)
+2025-03-26 19:05:32,065 - __main__ - DEBUG - Sending image with base64 length 26948 to /v1/predict
+2025-03-26 19:05:32,230 - __main__ - DEBUG - Successfully encoded image /home/mario-linux/flowers_classification_app/tests/archive/test_images/rose/5249566718_6109630c83_m.jpg to base64 (length: 11600)
+2025-03-26 19:05:32,231 - __main__ - DEBUG - Sending image with base64 length 11600 to /v1/predict
+2025-03-26 19:05:32,234 - __main__ - DEBUG - Successfully encoded image /home/mario-linux/flowers_classification_app/tests/archive/test_images/rose/8667101118_87ea757b15.jpg to base64 (length: 24396)
+2025-03-26 19:05:32,234 - __main__ - DEBUG - Sending image with base64 length 24396 to /v1/predict
+2025-03-26 19:05:32,404 - __main__ - DEBUG - Successfully encoded image /home/mario-linux/flowers_classification_app/tests/archive/test_images/rose/19271410704_932d1f2c97_n.jpg to base64 (length: 20256)
+2025-03-26 19:05:32,405 - __main__ - DEBUG - Sending image with base64 length 20256 to /v1/predict
+2025-03-26 19:05:32,478 - __main__ - INFO - Limiting to 5 images out of 646 in folder dandelion
+2025-03-26 19:05:32,478 - __main__ - INFO - Processing 5 images from 'dandelion' (class index: unknown)
+2025-03-26 19:05:32,481 - __main__ - DEBUG - Successfully encoded image /home/mario-linux/flowers_classification_app/tests/archive/test_images/dandelion/17243540220_65b98eb926_n.jpg to base64 (length: 28452)
+2025-03-26 19:05:32,481 - __main__ - DEBUG - Sending image with base64 length 28452 to /v1/predict
+2025-03-26 19:05:32,483 - __main__ - DEBUG - Successfully encoded image /home/mario-linux/flowers_classification_app/tests/archive/test_images/dandelion/14185089716_2a48298d17.jpg to base64 (length: 44904)
+2025-03-26 19:05:32,483 - __main__ - DEBUG - Sending image with base64 length 44904 to /v1/predict
+2025-03-26 19:05:32,651 - __main__ - DEBUG - Successfully encoded image /home/mario-linux/flowers_classification_app/tests/archive/test_images/dandelion/4528742654_99d233223b_m.jpg to base64 (length: 9768)
+2025-03-26 19:05:32,652 - __main__ - DEBUG - Sending image with base64 length 9768 to /v1/predict
+2025-03-26 19:05:32,654 - __main__ - DEBUG - Successfully encoded image /home/mario-linux/flowers_classification_app/tests/archive/test_images/dandelion/19691175559_ef12b8b354_n.jpg to base64 (length: 12924)
+2025-03-26 19:05:32,654 - __main__ - DEBUG - Sending image with base64 length 12924 to /v1/predict
+2025-03-26 19:05:32,822 - __main__ - DEBUG - Successfully encoded image /home/mario-linux/flowers_classification_app/tests/archive/test_images/dandelion/18276105805_d31d3f7e71.jpg to base64 (length: 34368)
+2025-03-26 19:05:32,822 - __main__ - DEBUG - Sending image with base64 length 34368 to /v1/predict
+2025-03-26 19:05:32,898 - __main__ - INFO - Limiting to 5 images out of 495 in folder sunflower
+2025-03-26 19:05:32,898 - __main__ - INFO - Processing 5 images from 'sunflower' (class index: 54)
+2025-03-26 19:05:32,901 - __main__ - DEBUG - Successfully encoded image /home/mario-linux/flowers_classification_app/tests/archive/test_images/sunflower/5526324308_b333da0e57_n.jpg to base64 (length: 27152)
+2025-03-26 19:05:32,902 - __main__ - DEBUG - Sending image with base64 length 27152 to /v1/predict
+2025-03-26 19:05:32,904 - __main__ - DEBUG - Successfully encoded image /home/mario-linux/flowers_classification_app/tests/archive/test_images/sunflower/6482016425_d8fab362f6.jpg to base64 (length: 32300)
+2025-03-26 19:05:32,904 - __main__ - DEBUG - Sending image with base64 length 32300 to /v1/predict
+2025-03-26 19:05:33,062 - __main__ - DEBUG - Successfully encoded image /home/mario-linux/flowers_classification_app/tests/archive/test_images/sunflower/4932735566_2327bf319a.jpg to base64 (length: 72020)
+2025-03-26 19:05:33,063 - __main__ - DEBUG - Sending image with base64 length 72020 to /v1/predict
+2025-03-26 19:05:33,066 - __main__ - DEBUG - Successfully encoded image /home/mario-linux/flowers_classification_app/tests/archive/test_images/sunflower/19756232959_17cde3b9f0_m.jpg to base64 (length: 23508)
+2025-03-26 19:05:33,066 - __main__ - DEBUG - Sending image with base64 length 23508 to /v1/predict
+2025-03-26 19:05:33,226 - __main__ - DEBUG - Successfully encoded image /home/mario-linux/flowers_classification_app/tests/archive/test_images/sunflower/19915160340_ec904edbdf_n.jpg to base64 (length: 19672)
+2025-03-26 19:05:33,226 - __main__ - DEBUG - Sending image with base64 length 19672 to /v1/predict
+2025-03-26 19:05:33,305 - __main__ - INFO - Limiting to 5 images out of 607 in folder tulip
+2025-03-26 19:05:33,305 - __main__ - INFO - Processing 5 images from 'tulip' (class index: unknown)
+2025-03-26 19:05:33,308 - __main__ - DEBUG - Successfully encoded image /home/mario-linux/flowers_classification_app/tests/archive/test_images/tulip/14487762578_baba13d16a_m.jpg to base64 (length: 10824)
+2025-03-26 19:05:33,308 - __main__ - DEBUG - Sending image with base64 length 10824 to /v1/predict
+2025-03-26 19:05:33,310 - __main__ - DEBUG - Successfully encoded image /home/mario-linux/flowers_classification_app/tests/archive/test_images/tulip/16282277874_b92776b194.jpg to base64 (length: 33100)
+2025-03-26 19:05:33,311 - __main__ - DEBUG - Sending image with base64 length 33100 to /v1/predict
+2025-03-26 19:05:33,472 - __main__ - DEBUG - Successfully encoded image /home/mario-linux/flowers_classification_app/tests/archive/test_images/tulip/7166626128_8e0983ac8e_n.jpg to base64 (length: 22336)
+2025-03-26 19:05:33,472 - __main__ - DEBUG - Sending image with base64 length 22336 to /v1/predict
+2025-03-26 19:05:33,475 - __main__ - DEBUG - Successfully encoded image /home/mario-linux/flowers_classification_app/tests/archive/test_images/tulip/16594995743_ce72c61201_n.jpg to base64 (length: 18272)
+2025-03-26 19:05:33,476 - __main__ - DEBUG - Sending image with base64 length 18272 to /v1/predict
+2025-03-26 19:05:33,640 - __main__ - DEBUG - Successfully encoded image /home/mario-linux/flowers_classification_app/tests/archive/test_images/tulip/7481217920_6f65766a1c_n.jpg to base64 (length: 34976)
+2025-03-26 19:05:33,640 - __main__ - DEBUG - Sending image with base64 length 34976 to /v1/predict
+2025-03-26 19:05:33,717 - __main__ - INFO - Limiting to 5 images out of 501 in folder daisy
+2025-03-26 19:05:33,717 - __main__ - INFO - Processing 5 images from 'daisy' (class index: unknown)
+2025-03-26 19:05:33,720 - __main__ - DEBUG - Successfully encoded image /home/mario-linux/flowers_classification_app/tests/archive/test_images/daisy/18684594849_7dd3634f5e_n.jpg to base64 (length: 28956)
+2025-03-26 19:05:33,720 - __main__ - DEBUG - Successfully encoded image /home/mario-linux/flowers_classification_app/tests/archive/test_images/daisy/3356112863_75da8bca2c_m.jpg to base64 (length: 17984)
+2025-03-26 19:05:33,720 - __main__ - DEBUG - Sending image with base64 length 28956 to /v1/predict
+2025-03-26 19:05:33,721 - __main__ - DEBUG - Sending image with base64 length 17984 to /v1/predict
+2025-03-26 19:05:33,730 - __main__ - WARNING - API request failed with status 500: {"error":"cannot identify image file '/app/temp_image.jpg'","success":false}
+
+2025-03-26 19:05:33,732 - __main__ - DEBUG - Successfully encoded image /home/mario-linux/flowers_classification_app/tests/archive/test_images/daisy/14167534527_781ceb1b7a_n.jpg to base64 (length: 15924)
+2025-03-26 19:05:33,733 - __main__ - DEBUG - Sending image with base64 length 15924 to /v1/predict
+2025-03-26 19:05:33,880 - __main__ - DEBUG - Successfully encoded image /home/mario-linux/flowers_classification_app/tests/archive/test_images/daisy/3533954656_79156c8473.jpg to base64 (length: 14548)
+2025-03-26 19:05:33,881 - __main__ - DEBUG - Sending image with base64 length 14548 to /v1/predict
+2025-03-26 19:05:33,890 - __main__ - DEBUG - Successfully encoded image /home/mario-linux/flowers_classification_app/tests/archive/test_images/daisy/3310644753_5607eb96a4_m.jpg to base64 (length: 11348)
+2025-03-26 19:05:33,890 - __main__ - DEBUG - Sending image with base64 length 11348 to /v1/predict
+2025-03-26 19:05:34,050 - __main__ - INFO - V1 API Test completed with 25 requests
+2025-03-26 19:05:34,051 - __main__ - INFO - Analyzing V1 API results...
+2025-03-26 19:05:34,054 - __main__ - INFO - 
+============================================================
+2025-03-26 19:05:34,054 - __main__ - INFO - API STRESS TEST RESULTS SUMMARY
+2025-03-26 19:05:34,055 - __main__ - INFO - ============================================================
+2025-03-26 19:05:34,055 - __main__ - INFO - Total Requests: 25
+2025-03-26 19:05:34,055 - __main__ - INFO - Successful Requests: 24 (96.00%)
+2025-03-26 19:05:34,055 - __main__ - INFO - Failed Requests: 1 (4.00%)
+2025-03-26 19:05:34,055 - __main__ - INFO - Accuracy: 12.50%
+2025-03-26 19:05:34,055 - __main__ - INFO - Mean Response Time: 0.143 seconds
+2025-03-26 19:05:34,055 - __main__ - INFO - Median Response Time: 0.161 seconds
+2025-03-26 19:05:34,055 - __main__ - INFO - 95th Percentile Response Time: 0.172 seconds
+2025-03-26 19:05:34,056 - __main__ - INFO - Min/Max Response Time: 0.008/0.173 seconds
+2025-03-26 19:05:34,056 - __main__ - INFO - ============================================================
+2025-03-26 19:05:34,497 - __main__ - INFO - Results visualization saved to results/v1/stress_test_results.png
+2025-03-26 19:05:34,499 - __main__ - INFO - Detailed results saved to results/v1/stress_test_results.csv
+2025-03-26 19:05:34,499 - __main__ - INFO - 
+================================================================================
+2025-03-26 19:05:34,499 - __main__ - INFO - API Stress Test Completed in 2.45 seconds
+2025-03-26 19:05:34,499 - __main__ - INFO - ================================================================================
+2025-03-26 19:09:18,184 - __main__ - INFO - ================================================================================
+2025-03-26 19:09:18,184 - __main__ - INFO - Starting API Stress Test at 2025-03-26 19:09:18
+2025-03-26 19:09:18,184 - __main__ - INFO - API Endpoint: http://localhost:9000
+2025-03-26 19:09:18,184 - __main__ - INFO - Test Images Directory: /home/mario-linux/flowers_classification_app/tests/archive/test_images
+2025-03-26 19:09:18,184 - __main__ - INFO - Concurrent Requests: 1
+2025-03-26 19:09:18,184 - __main__ - INFO - Samples per Class: All
+2025-03-26 19:09:18,184 - __main__ - INFO - Max Images per Folder: All
+2025-03-26 19:09:18,184 - __main__ - INFO - Request Delay: 0.2 seconds
+2025-03-26 19:09:18,185 - __main__ - INFO - ================================================================================
+2025-03-26 19:09:18,185 - __main__ - INFO - 
+Testing V1 API Endpoint...
+2025-03-26 19:09:18,187 - __main__ - INFO - Processing 497 images from 'rose' (class index: 74)
+2025-03-26 19:11:35,834 - __main__ - INFO - Processing 646 images from 'dandelion' (class index: unknown)
+2025-03-26 19:14:35,977 - __main__ - INFO - Processing 495 images from 'sunflower' (class index: 54)
+2025-03-26 19:16:54,509 - __main__ - INFO - Processing 607 images from 'tulip' (class index: unknown)
+2025-03-26 19:19:44,367 - __main__ - INFO - Processing 501 images from 'daisy' (class index: unknown)
+2025-03-26 19:22:04,319 - __main__ - INFO - V1 API Test completed with 2746 requests
+2025-03-26 19:22:04,319 - __main__ - INFO - Analyzing V1 API results...
+2025-03-26 19:22:04,327 - __main__ - INFO - 
+============================================================
+2025-03-26 19:22:04,327 - __main__ - INFO - API STRESS TEST RESULTS SUMMARY
+2025-03-26 19:22:04,327 - __main__ - INFO - ============================================================
+2025-03-26 19:22:04,327 - __main__ - INFO - Total Requests: 2746
+2025-03-26 19:22:04,327 - __main__ - INFO - Successful Requests: 2746 (100.00%)
+2025-03-26 19:22:04,327 - __main__ - INFO - Failed Requests: 0 (0.00%)
+2025-03-26 19:22:04,327 - __main__ - INFO - Accuracy: 8.45%
+2025-03-26 19:22:04,327 - __main__ - INFO - Mean Response Time: 0.071 seconds
+2025-03-26 19:22:04,327 - __main__ - INFO - Median Response Time: 0.069 seconds
+2025-03-26 19:22:04,328 - __main__ - INFO - 95th Percentile Response Time: 0.076 seconds
+2025-03-26 19:22:04,328 - __main__ - INFO - Min/Max Response Time: 0.053/0.510 seconds
+2025-03-26 19:22:04,328 - __main__ - INFO - ============================================================
+2025-03-26 19:22:05,210 - __main__ - INFO - Results visualization saved to results/v1/stress_test_results.png
+2025-03-26 19:22:05,231 - __main__ - INFO - Detailed results saved to results/v1/stress_test_results.csv
+2025-03-26 19:22:05,232 - __main__ - INFO - 
+================================================================================
+2025-03-26 19:22:05,232 - __main__ - INFO - API Stress Test Completed in 767.05 seconds
+2025-03-26 19:22:05,232 - __main__ - INFO - ================================================================================

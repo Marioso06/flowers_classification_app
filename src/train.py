@@ -2,12 +2,14 @@ import torch
 import os
 import sys
 import logging
+import time
 import data_processing as dp
 import mlflow
 import mlflow.pytorch
 import yaml
 from utils.model_configuration import ModelConfiguration as mc
 from utils.arg_parser import get_input_args
+from utils.monitoring import get_training_monitor
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
@@ -43,10 +45,21 @@ class Trainer:
         self.training_compute = training_compute
 
     def train(self):
+        # Initialize Prometheus monitoring
+        monitor = get_training_monitor(port=8002)
+        monitor.start()
+        logger.info("Training metrics available at http://localhost:8002/metrics")
+        
         steps = 0
         running_loss = 0
         for epoch in range(self.epochs):
+            # Record epoch start in Prometheus
+            epoch_start_time = monitor.record_epoch_start()
+            
             for inputs, labels in self.trainloader:
+                # Record batch start time
+                batch_start_time = time.time()
+                
                 steps +=1
                 inputs, labels = inputs.to(self.device), labels.to(self.device)
                 
@@ -59,16 +72,33 @@ class Trainer:
                 
                 running_loss += loss.item()
                 
+                # Record batch metrics in Prometheus
+                batch_duration = time.time() - batch_start_time
+                monitor.record_batch(duration=batch_duration)
+                
                 if steps % self.print_every == 0:
                     valid_loss, accuracy = self.validate()
-                    mlflow.log_metric("train_loss", running_loss / self.print_every, step=steps)
-                    mlflow.log_metric("valid_loss", valid_loss / len(self.validloader), step=steps)
-                    mlflow.log_metric("valid_accuracy", accuracy / len(self.validloader), step=steps)
+                    train_loss = running_loss / self.print_every
+                    valid_loss_avg = valid_loss / len(self.validloader)
+                    valid_accuracy_avg = accuracy / len(self.validloader)
+                    
+                    # Log to MLflow
+                    mlflow.log_metric("train_loss", train_loss, step=steps)
+                    mlflow.log_metric("valid_loss", valid_loss_avg, step=steps)
+                    mlflow.log_metric("valid_accuracy", valid_accuracy_avg, step=steps)
+                    
+                    # Update Prometheus metrics
+                    monitor.record_epoch_end(
+                        epoch_start_time,
+                        train_loss=train_loss,
+                        valid_loss=valid_loss_avg,
+                        valid_accuracy=valid_accuracy_avg
+                    )
 
                     print(f"Epoch {epoch+1}/{self.epochs}.."
-                        f"Train loss: {running_loss/self.print_every:.3f}.."
-                        f"Valid loss: {valid_loss/len(self.validloader):.3f}.."
-                        f"Valid accuracy: {accuracy/len(self.validloader):.3f}")
+                        f"Train loss: {train_loss:.3f}.."
+                        f"Valid loss: {valid_loss_avg:.3f}.."
+                        f"Valid accuracy: {valid_accuracy_avg:.3f}")
                     running_loss = 0
                     self.model.train()
 
