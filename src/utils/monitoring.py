@@ -16,7 +16,7 @@ logger = logging.getLogger(__name__)
 class TrainingMonitor:
     """Prometheus metrics collector for model training processes"""
     
-    def __init__(self, port=8000):
+    def __init__(self, port=8002):
         """
         Initialize the training monitor with Prometheus metrics
         
@@ -141,7 +141,7 @@ class TrainingMonitor:
             self.batch_duration.observe(duration)
 
 # Singleton instance for easy import
-def get_training_monitor(port=8000):
+def get_training_monitor(port=8002):
     """Get or create the training monitor singleton instance"""
     if not hasattr(get_training_monitor, 'instance'):
         get_training_monitor.instance = TrainingMonitor(port=port)

@@ -46,9 +46,9 @@ class Trainer:
 
     def train(self):
         # Initialize Prometheus monitoring
-        monitor = get_training_monitor(port=8000)
+        monitor = get_training_monitor(port=8002)
         monitor.start()
-        logger.info("Training metrics available at http://localhost:8000/metrics")
+        logger.info("Training metrics available at http://localhost:8002/metrics")
         
         steps = 0
         running_loss = 0

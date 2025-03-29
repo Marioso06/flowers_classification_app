@@ -23,11 +23,8 @@ scrape_configs:
   - job_name: 'model-training'
     scrape_interval: 5s
     static_configs:
-      # Try multiple host address options
-      - targets: 
-        - 'host.docker.internal:8000'  # Docker Desktop (Windows/Mac)
-        - '172.17.0.1:8000'            # Default Docker bridge network
-        - 'host-gateway:8000'          # Linux Docker
+      - targets:
+        - 'training-metrics:8002'
     metrics_path: /metrics
     scheme: http
     scrape_timeout: 3s
