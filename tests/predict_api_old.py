@@ -20,8 +20,7 @@ import lime
 from lime import lime_image
 from skimage.segmentation import mark_boundaries
 
-from src.utils.arg_parser import get_input_args
-from src.utils.image_normalization import process_image, imshow
+from src.utils.image_normalization import process_image
 from flask import Flask, jsonify, request, send_file
 from prometheus_flask_exporter import PrometheusMetrics
 from prometheus_client import Counter, Histogram, Gauge
@@ -54,6 +53,127 @@ logger.info(f"Models directory: {MODELS_DIR}")
 
 with open(CAT_NAMES_PATH, 'r') as f:
     cat_to_name = json.load(f)
+
+
+def create_explanation_visualization(original_image, heatmap, prediction_results, explanation_type,
+                                   title2="Feature Importance", title3="Importance Overlay",
+                                   cmap="RdBu_r", alpha=0.7, third_panel_type="overlay", mask=None):
+    """Create a standardized visualization for explanations (SHAP, LIME, etc.)
+    
+    Args:
+        original_image: The original image to display
+        heatmap: The heatmap representing feature importance
+        prediction_results: Dictionary with prediction results
+        explanation_type: Type of explanation ("SHAP", "LIME", etc.)
+        title2: Title for the second panel (default: "Feature Importance")
+        title3: Title for the third panel (default: "Importance Overlay")
+        cmap: Colormap to use (default: "RdBu_r")
+        alpha: Alpha value for overlay (default: 0.7)
+        third_panel_type: Type of third panel ("overlay" or "segments")
+        mask: Optional segmentation mask for LIME (default: None)
+        
+    Returns:
+        Dictionary with paths to the saved visualization
+    """
+    # Log original image dimensions for debugging
+    original_h, original_w = original_image.shape[:2]
+    logger.info(f"Original image dimensions for {explanation_type}: {original_w}x{original_h}")
+    
+    # Ensure heatmap dimensions match original image
+    if heatmap.shape[:2] != original_image.shape[:2]:
+        logger.info(f"Resizing heatmap from {heatmap.shape[:2]} to match original image {original_image.shape[:2]}")
+        from skimage.transform import resize
+        heatmap = resize(heatmap, (original_h, original_w), order=1, anti_aliasing=True)
+    
+    # Calculate a better figure size based on the image dimensions
+    # Use a larger base size for higher quality
+    scale_factor = max(1.0, original_w / 400)  # Scale up for larger images
+    fig_width = 18 * scale_factor  # Wider figure for better visibility
+    fig_height = 6 * scale_factor  # Proportional height
+    
+    # Generate visualization with improved size
+    plt.figure(figsize=(fig_width, fig_height), dpi=100)
+    
+    # Original image
+    plt.subplot(1, 3, 1)
+    plt.imshow(original_image)
+    plt.title('Original Image', fontsize=12 * scale_factor)
+    plt.axis('off')
+    
+    # Heatmap visualization
+    plt.subplot(1, 3, 2)
+    plt.imshow(heatmap, cmap=cmap)
+    plt.title(title2, fontsize=12 * scale_factor)
+    plt.axis('off')
+    plt.colorbar(shrink=0.8)
+    
+    # Third panel - either overlay or segments
+    plt.subplot(1, 3, 3)
+    if third_panel_type == "overlay":
+        plt.imshow(original_image)
+        plt.imshow(heatmap, cmap=cmap, alpha=alpha)
+        plt.title(title3, fontsize=12 * scale_factor)
+        plt.colorbar(shrink=0.8)
+    elif third_panel_type == "segments" and mask is not None:
+        plt.imshow(mark_boundaries(original_image, mask))
+        plt.title('Superpixel Boundaries', fontsize=12 * scale_factor)
+    plt.axis('off')
+    
+    # Adjust figure layout with more padding
+    plt.tight_layout(pad=2.0)
+    
+    # Create static folder if it doesn't exist
+    static_folder = os.path.join(PROJECT_ROOT, "static")
+    if not os.path.exists(static_folder):
+        os.makedirs(static_folder)
+    
+    # Save the plot to a static file with timestamp
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    filename = f"{explanation_type.lower()}_explanation_{timestamp}.png"
+    static_path = os.path.join(static_folder, filename)
+    
+    # Save with higher DPI for better quality output
+    # Higher DPI gives better resolution without changing figure dimensions
+    # Use original image dimensions to determine appropriate DPI
+    original_h, original_w = original_image.shape[:2]
+    # Determine base DPI based on image size - larger images need higher DPI
+    base_dpi = 150  # Higher baseline DPI for all images
+    if original_w > 300 or original_h > 300:
+        base_dpi = 200
+    if original_w > 600 or original_h > 600:
+        base_dpi = 300
+        
+    logger.info(f"Saving visualization with DPI={base_dpi}")
+    plt.savefig(static_path, dpi=base_dpi, bbox_inches='tight', pad_inches=0.2)
+    plt.close()
+    
+    # Return the paths and explanation info
+    file_url = f"/static/{filename}"
+    logger.info(f"{explanation_type} explanation saved to {static_path}")
+    
+    description = get_explanation_description(explanation_type)
+    
+    return {
+        "visualization_path": static_path,
+        "visualization_url": file_url,
+        "prediction": prediction_results,
+        "explanation_type": explanation_type,
+        "description": description
+    }
+
+
+def get_explanation_description(explanation_type):
+    """Get a standardized description for each explanation type"""
+    if explanation_type in ["SHAP", "GradientSHAP"]:
+        return "SHAP values show the contribution of each pixel to the prediction."
+    elif explanation_type == "DeepSHAP":
+        return "DeepSHAP values show the contribution of each pixel to the prediction."
+    elif explanation_type == "LIME":
+        return "LIME segments the image and shows which regions contribute to the prediction."
+    elif explanation_type == "Fallback":
+        return "A simple occlusion-based saliency map showing important regions for prediction."
+    else:
+        return f"{explanation_type} explanation shows which parts of the image influence the prediction."
 
 def process_base64_image(base64_image):
     
@@ -196,18 +316,319 @@ def get_model_wrapper(model):
             super(ModelWrapper, self).__init__()
             self.model = model
             self.device = next(model.parameters()).device
+            self.class_to_idx = model.class_to_idx
             
         def forward(self, x):
             # Ensure input is on the correct device
             x = x.to(self.device)
             return self.model(x)
+        
+        def predict_proba(self, x):
+            # Method for scikit-learn compatibility (used by SHAP)
+            with torch.no_grad():
+                output = self.forward(torch.FloatTensor(x))
+                return torch.nn.functional.softmax(output, dim=1).cpu().numpy()
     
     return ModelWrapper(model)
 
 
 def generate_shap_explanation(image_data, model, top_k=5):
-    """Wrapper function to maintain backward compatibility"""
-    return generate_custom_shap_explanation(image_data, model, top_k)
+    """Generate SHAP explanations for image classification
+    
+    This function tries to use the GradientExplainer first, which is more efficient for deep networks.
+    If that fails, it falls back to DeepExplainer and then to custom implementation.
+    """
+    try:
+        logger.info("=== Attempting to use GradientExplainer for SHAP explanation ===")
+        result = generate_gradient_shap_explanation(image_data, model, top_k)
+        logger.info("GradientExplainer successful!")
+        return result
+    except Exception as e:
+        logger.warning(f"GradientExplainer failed: {str(e)}\n{traceback.format_exc()}")
+        logger.warning("Trying DeepExplainer...")
+        try:
+            logger.info("=== Attempting to use DeepExplainer for SHAP explanation ===")
+            result = generate_deep_shap_explanation(image_data, model, top_k)
+            logger.info("DeepExplainer successful!")
+            return result
+        except Exception as e:
+            logger.warning(f"DeepExplainer failed: {str(e)}\n{traceback.format_exc()}")
+            logger.warning("Falling back to custom implementation...")
+            logger.info("=== Using custom occlusion-based implementation for SHAP explanation ===")
+            return generate_custom_shap_explanation(image_data, model, top_k)
+
+
+def generate_gradient_shap_explanation(image_data, model, top_k=5):
+    """Generate SHAP explanations using the GradientExplainer
+    
+    This implementation follows the approach in the SHAP documentation for deep learning models,
+    extracting feature importance directly using gradients.
+    """
+    # Get device
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    
+    # Move model to the appropriate device
+    model.to(device)
+    model.eval()
+    
+    # Store the original image for visualization (convert from CHW to HWC)
+    original_image = image_data.transpose(1, 2, 0).copy()
+    
+    # De-normalize the image for visualization
+    mean = np.array([0.485, 0.456, 0.406])
+    std = np.array([0.229, 0.224, 0.225])
+    original_image = original_image * std + mean
+    original_image = np.clip(original_image, 0.0, 1.0)
+    
+    # Get prediction to determine which class to explain
+    logger.info("Getting prediction to determine class to explain")
+    prediction_results = predict(image_data, model, top_k)
+    class_idx = int(prediction_results['classes'][0])  # Explain top class
+    
+    # Create a background distribution of inputs
+    logger.info("Creating background distribution for GradientExplainer")
+    
+    # For GradientExplainer, we generally want a random normal distribution around our input
+    n_background = 20
+    background = np.zeros((n_background, 3, 224, 224), dtype=np.float32)
+    
+    # Create variations of the input image with small noise
+    for i in range(n_background):
+        # Add small random noise
+        noise = np.random.normal(0, 0.01, image_data.shape).astype(np.float32)
+        background[i] = np.clip(image_data + noise, 0, 1)
+    
+    # We need to prepare the model for the GradientExplainer
+    # First, get input and output references
+    
+    class GradientWrapperModel(nn.Module):
+        def __init__(self, model):
+            super(GradientWrapperModel, self).__init__()
+            self.model = model
+            self.feature_layer = None  # Will hold intermediate features
+            self.handles = []
+            
+            # Register hook to capture intermediate features
+            # For a ResNet model, we'll capture the output of the final convolutional layer
+            # We need to identify which layer to target based on the model architecture
+            for name, module in self.model.named_modules():
+                if isinstance(module, torch.nn.Conv2d):
+                    # Save the last conv layer
+                    self.last_conv_name = name
+                    self.last_conv_layer = module
+            
+            # Register a forward hook on the last convolutional layer
+            handle = self.last_conv_layer.register_forward_hook(self._hook_fn)
+            self.handles.append(handle)
+            
+        def _hook_fn(self, module, input, output):
+            self.feature_layer = output
+            
+        def forward(self, x):
+            self.feature_layer = None
+            output = self.model(x)
+            return output, self.feature_layer
+            
+        def close(self):
+            for handle in self.handles:
+                handle.remove()
+    
+    # Wrap the model to access intermediate features
+    gradient_model = GradientWrapperModel(model)
+    gradient_model.to(device)
+    gradient_model.eval()
+    
+    # Convert tensors
+    background_tensor = torch.FloatTensor(background).to(device)
+    input_tensor = torch.FloatTensor(image_data).unsqueeze(0).to(device)  # Add batch dimension
+    
+    # Get intermediate layer output for background
+    logger.info("Extracting background features for gradient explanation")
+    with torch.no_grad():
+        # Forward pass on all background samples to get intermediate features
+        background_features = []
+        for i in range(n_background):
+            _, features = gradient_model(background_tensor[i:i+1])
+            background_features.append(features.detach().cpu().numpy())
+        background_features = np.concatenate(background_features)
+    
+    # Create the SHAP explainer
+    logger.info("Creating SHAP GradientExplainer")
+    
+    # Get output and feature layers
+    with torch.no_grad():
+        output, feature_layer = gradient_model(input_tensor)
+    
+    # Extract model info for class indexing
+    idx_to_class = {v: k for k, v in model.class_to_idx.items()}
+    
+    # Create GradientExplainer
+    def model_output(feature_tensor):
+        # Forward pass from intermediate features to output
+        # This is a simplified approach - in a real scenario, you'd need to properly
+        # trace the network from the feature layer to output
+        feature_tensor = torch.FloatTensor(feature_tensor).to(device)
+        with torch.no_grad():
+            # Use a dummy input to trace through the network
+            dummy_input = input_tensor.clone()
+            # Get the full model output and features
+            output, _ = gradient_model(dummy_input)
+            # We use the prediction for the dummy input since we can't easily
+            # forward from the intermediate features to output
+            return output.cpu().numpy()
+    
+    # Initialize explainer on the feature layer
+    explainer = shap.GradientExplainer((feature_layer, output), background_features)
+    
+    # Compute SHAP values
+    logger.info("Computing SHAP values with GradientExplainer")
+    shap_values, indices = explainer.shap_values(feature_layer.cpu().numpy(), ranked_outputs=top_k)
+    
+    # Process SHAP values and indices
+    # Each shap_values entry corresponds to a ranked output class
+    # indices contains the actual class indices that SHAP ranked
+    # We'll use the first one (top predicted class according to SHAP)
+    class_shap_values = shap_values[0][0]  # [0] for top class, [0] for first sample
+    
+    # Get the actual class index from SHAP's results
+    top_class_idx = int(indices[0][0])  # First class, first sample
+    logger.info(f"Top class according to SHAP: {top_class_idx}")
+    
+    # Map the index to our class names for visualization
+    # This ensures we're correctly labeling the class that SHAP has explained
+    idx_to_class = {v: k for k, v in model.class_to_idx.items()}
+    try:
+        class_name = idx_to_class.get(top_class_idx, "Unknown")
+        logger.info(f"Explaining class: {class_name} (index {top_class_idx})")
+    except Exception as e:
+        logger.warning(f"Error mapping class index: {e}")
+    
+    # Determine the original image dimensions for proper upsampling
+    original_h, original_w = original_image.shape[:2]
+    logger.info(f"Original image dimensions: {original_w}x{original_h}")
+    
+    # Upsample the SHAP values to match the original image dimensions
+    # SHAP values are for feature maps, we need to upsample to original image size
+    feature_size = class_shap_values.shape[1]  # Size of feature map
+    
+    # Sum across channels to get importance
+    channel_sum = np.sum(np.abs(class_shap_values), axis=0)
+    
+    # Normalize for visualization
+    if channel_sum.max() > 0:
+        channel_sum = channel_sum / channel_sum.max()
+    
+    # Upsample the feature importance map to match the original image dimensions
+    from skimage.transform import resize
+    upsampled_shap = resize(channel_sum, (original_h, original_w), order=1, anti_aliasing=True)
+    
+    # Clean up gradient model resources
+    gradient_model.close()
+    
+    # Use our shared visualization function for consistent output
+    return create_explanation_visualization(
+        original_image=original_image,
+        heatmap=upsampled_shap,
+        prediction_results=prediction_results,
+        explanation_type="GradientSHAP",
+        title2="Feature Importance",
+        title3="Importance Overlay",
+        cmap="RdBu_r",
+        alpha=0.7,
+        third_panel_type="overlay"
+    )
+
+
+def generate_deep_shap_explanation(image_data, model, top_k=5):
+    """Generate SHAP explanations for image classification using the SHAP library
+    
+    This function implements the DeepExplainer from SHAP which is designed for
+    deep learning models and provides meaningful explanations for image inputs.
+    """
+    # Get device
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    
+    # Move model to the appropriate device
+    model.to(device)
+    model.eval()
+    
+    # Store the original image for visualization (convert from CHW to HWC)
+    original_image = image_data.transpose(1, 2, 0).copy()
+    
+    # De-normalize the image for visualization
+    mean = np.array([0.485, 0.456, 0.406])
+    std = np.array([0.229, 0.224, 0.225])
+    original_image = original_image * std + mean
+    original_image = np.clip(original_image, 0.0, 1.0)
+    
+    # Get prediction to determine which class to explain
+    logger.info("Getting prediction to determine class to explain")
+    prediction_results = predict(image_data, model, top_k)
+    class_idx = int(prediction_results['classes'][0])  # Explain top class
+    
+    # For SHAP, we need a batch of background samples
+    # We'll create some random noise samples as background
+    # This is a simplified approach - ideally we'd use actual background samples from the dataset
+    logger.info("Creating background samples for SHAP explainer")
+    
+    # Use a reduced number of background samples to improve performance
+    n_background = 10
+    background = np.random.random((n_background, 3, 224, 224)).astype(np.float32)
+    
+    # Normalize background samples the same way as the input
+    for i in range(n_background):
+        background[i] = background[i] * 0.1  # Reduce intensity of random samples
+    
+    # Convert to PyTorch tensors
+    background_tensor = torch.FloatTensor(background)
+    input_tensor = torch.FloatTensor(image_data).unsqueeze(0)  # Add batch dimension
+    
+    # Create a wrapper model that returns softmax probabilities
+    wrapped_model = get_model_wrapper(model)
+    
+    # Create the SHAP explainer
+    logger.info("Creating SHAP DeepExplainer")
+    explainer = shap.DeepExplainer(wrapped_model, background_tensor)
+
+    # Generate SHAP values - DeepExplainer needs batch input
+    logger.info("Computing SHAP values")
+    # This calculation can be very memory intensive
+    shap_values = explainer.shap_values(input_tensor)
+    
+    # Since we get SHAP values for each class, take the one for our predicted class
+    idx_to_class = {v: k for k, v in model.class_to_idx.items()}
+    class_idx_pos = list(idx_to_class.keys()).index(class_idx)
+    
+    # Get the SHAP values for the predicted class
+    class_shap_values = shap_values[class_idx_pos][0]  # First element of batch
+    
+    # Generate visualization
+    plt.figure(figsize=(15, 5))
+    
+    # Original image - ensure we're showing the actual unaltered image
+    plt.subplot(1, 3, 1)
+    plt.imshow(original_image)
+    plt.title('Original Image')
+    plt.axis('off')
+    
+    # Sum across channels for feature importance heatmap
+    shap_map = np.sum(np.abs(class_shap_values), axis=0)
+    # Normalize for better visualization
+    if shap_map.max() > 0:
+        shap_map = shap_map / shap_map.max()
+    
+    # Use our shared visualization function for consistent output
+    return create_explanation_visualization(
+        original_image=original_image,
+        heatmap=shap_map,
+        prediction_results=prediction_results,
+        explanation_type="DeepSHAP", 
+        cmap="RdBu_r", 
+        alpha=0.7,
+        third_panel_type="overlay"
+    )
+    
+
 
 def normalize_image_for_explanation(image_data):
     """Normalize image data to standard format for explanations
@@ -550,155 +971,141 @@ def generate_fallback_explanation(image_data, model, top_k=5):
     if np.max(saliency_map) > 0:
         saliency_map = saliency_map / np.max(saliency_map)
     
-    # Generate visualization
-    plt.figure(figsize=(15, 5))
-    
-    plt.subplot(1, 3, 1)
-    # Display the properly denormalized original image
+    # Use our standardized visualization function
     try:
-        plt.imshow(original_image)
+        display_image = original_image
     except Exception as e:
-        logger.error(f"Error displaying original image: {e}")
+        logger.error(f"Error preparing original image: {e}")
         # Last resort fallback
-        norm_img = image_data.transpose(1, 2, 0).copy()
+        display_image = image_data.transpose(1, 2, 0).copy()
         # Apply standard denormalization
         mean = np.array([0.485, 0.456, 0.406])
         std = np.array([0.229, 0.224, 0.225])
-        norm_img = norm_img * std + mean
-        plt.imshow(np.clip(norm_img, 0, 1))
-    plt.title('Original Image')
-    plt.axis('off')
+        display_image = display_image * std + mean
+        display_image = np.clip(display_image, 0, 1)
     
-    plt.subplot(1, 3, 2)
-    plt.imshow(saliency_map, cmap='RdBu_r')
-    plt.title('Feature Importance')
-    plt.axis('off')
-    plt.colorbar()
-    
-    # Add the overlay visualization
-    plt.subplot(1, 3, 3)
-    # Use the same correctly denormalized image
-    plt.imshow(original_image)
-    plt.imshow(saliency_map, cmap='RdBu_r', alpha=0.5)
-    plt.title('Importance Overlay')
-    plt.axis('off')
-    plt.colorbar()
-    
-    # Create static folder if it doesn't exist
-    static_folder = os.path.join(PROJECT_ROOT, "static")
-    if not os.path.exists(static_folder):
-        os.makedirs(static_folder)
-    
-    # Adjust the figure size for better visualization of three subplots
-    plt.gcf().set_size_inches(15, 5)
-    plt.tight_layout()
-    
-    # Save the plot to a static file with timestamp
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    filename = f"fallback_explanation_{timestamp}.png"
-    static_path = os.path.join(static_folder, filename)
-    plt.savefig(static_path, dpi=100, bbox_inches='tight')
-    plt.close()
-    
-    # Don't convert to base64 to avoid large payloads
-    file_url = f"/static/{filename}"
-    logger.info(f"Fallback explanation saved to {static_path}")
-    
-    return {
-        "visualization_path": static_path,
-        "visualization_url": file_url,
-        "prediction": prediction_results,
-        "explanation_type": "Occlusion-based Saliency (Fallback)",
-        "description": "SHAP values show the contribution of each pixel to the prediction."
-    }
+    return create_explanation_visualization(
+        original_image=display_image,
+        heatmap=saliency_map,
+        prediction_results=prediction_results,
+        explanation_type="Fallback",
+        title2="Feature Importance",
+        title3="Importance Overlay",
+        cmap="RdBu_r",
+        alpha=0.5,
+        third_panel_type="overlay"
+    )
 
 
 def generate_lime_explanation(image_data, model, top_k=5):
-    """Generate LIME explanations for a model prediction"""
-    # Convert to PyTorch tensor for prediction
-    tensor_image = torch.from_numpy(image_data).type(torch.FloatTensor)
+    """Generate LIME explanations for a model prediction using the lime_image library
     
-    # Add batch dimension
-    tensor_image = tensor_image.unsqueeze(0)
-    
-    # Get device
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    
-    # Move model to the appropriate device
-    model.to(device)
-    model.eval()
-    
-    # Create a function for LIME to predict with our model
-    def predict_fn(images):
-        # LIME uses (H,W,C) format and scales 0-1, while our model expects (C,H,W)
-        batch = np.stack([img.transpose((2, 0, 1)) for img in images])
-        tensor = torch.from_numpy(batch).type(torch.FloatTensor).to(device)
+    This function implements a proper LIME image explainer which segments the image
+    and learns a local surrogate model to explain the prediction.
+    """
+    try:
+        # Get device
+        device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         
-        with torch.no_grad():
-            output = model(tensor)
-            probs = torch.nn.functional.softmax(output, dim=1).cpu().numpy()
+        # Move model to the appropriate device
+        model.to(device)
+        model.eval()
+        
+        # Store original image for visualization (convert from CHW to HWC)
+        original_image = image_data.transpose(1, 2, 0).copy()
+        
+        # De-normalize from the preprocessing that was applied
+        mean = np.array([0.485, 0.456, 0.406])
+        std = np.array([0.229, 0.224, 0.225])
+        original_image = original_image * std + mean
+        
+        # Clip to ensure values are in valid 0-1 range
+        original_image = np.clip(original_image, 0.0, 1.0)
+        
+        # Get prediction to determine which class to explain
+        logger.info("Getting prediction to determine class to explain")
+        prediction_results = predict(image_data, model, top_k)
+        top_class_idx = int(prediction_results['classes'][0])  # Explain top class
+        
+        # Create a function for LIME to predict with our model
+        def predict_fn(images):
+            # The images from LIME are in (batch, H, W, C) and RGB scaled 0-1
+            batch_size = len(images)
+            batch = np.zeros((batch_size, 3, 224, 224), dtype=np.float32)
             
-        return probs
-    
-    # Original image for visualization (convert to 0-1 range and proper format)
-    image_for_lime = image_data.transpose(1, 2, 0)
-    
-    # Initialize LIME explainer
-    explainer = lime_image.LimeImageExplainer()
-    
-    # Get explanation
-    explanation = explainer.explain_instance(
-        image_for_lime, 
-        predict_fn,
-        top_labels=top_k, 
-        hide_color=0, 
-        num_samples=1000
-    )
-    
-    # Get top class index
-    idx_to_class = {v: k for k, v in model.class_to_idx.items()}
-    top_class = explanation.top_labels[0]
-    
-    # Get the explanation for the top class
-    temp, mask = explanation.get_image_and_mask(
-        top_class, 
-        positive_only=True, 
-        num_features=10, 
-        hide_rest=False
-    )
-    
-    # Create visualization
-    plt.figure(figsize=(10, 5))
-    plt.subplot(1, 2, 1)
-    plt.imshow(image_for_lime)
-    plt.title('Original Image')
-    
-    plt.subplot(1, 2, 2)
-    plt.imshow(mark_boundaries(temp, mask))
-    plt.title('LIME Explanation')
-    
-    # Save the plot to a temporary file
-    temp_path = os.path.join(PROJECT_ROOT, "temp_lime_explanation.png")
-    plt.savefig(temp_path)
-    plt.close()
-    
-    # Convert image to base64 for API response
-    with open(temp_path, "rb") as img_file:
-        img_str = base64.b64encode(img_file.read()).decode('utf-8')
-    
-    # Clean up
-    if os.path.exists(temp_path):
-        os.remove(temp_path)
-    
-    # Get the model prediction for reference
-    prediction_results = predict(image_data, model, top_k)
-    
-    return {
-        "visualization": img_str,
-        "prediction": prediction_results,
-        "explanation_type": "LIME",
-        "description": "LIME identifies regions of the image that contribute most to the prediction."
-    }
+            for i, img in enumerate(images):
+                # LIME gives images in HWC format, convert to model input format (CHW)
+                # and apply ImageNet normalization
+                img = (img - mean) / std
+                batch[i] = img.transpose(2, 0, 1)
+            
+            # Convert to tensor and get predictions
+            tensor = torch.FloatTensor(batch).to(device)
+            
+            with torch.no_grad():
+                output = model(tensor)
+                probs = torch.nn.functional.softmax(output, dim=1).cpu().numpy()
+                
+            return probs
+        
+        # Initialize LIME explainer with verbose logging
+        logger.info("Creating LIME explainer")
+        explainer = lime_image.LimeImageExplainer(verbose=True)
+        
+        # Get explanation
+        logger.info("Computing LIME explanation")
+        explanation = explainer.explain_instance(
+            original_image,
+            predict_fn,
+            top_labels=1,  # Just explain the top prediction
+            hide_color=0,  # Black for hiding segments
+            num_samples=500,  # More samples gives better explanations but takes longer
+            num_features=10,  # Max number of superpixels to include
+            random_seed=42
+        )
+        
+        # Get the explanation for the top predicted class
+        # We need to map from our class_to_idx to the position in the model output
+        idx_to_class = {v: k for k, v in model.class_to_idx.items()}
+        top_class = top_class_idx
+        
+        # Get positive and negative contributions for visualization
+        temp, mask = explanation.get_image_and_mask(
+            explanation.top_labels[0],  # Use the first top label
+            positive_only=False,  # Show both positive and negative contributions
+            num_features=10,  # Top superpixels to include
+            hide_rest=False,  # Don't hide the rest of the image
+        )
+        
+        # Heatmap of all features (positive and negative)
+        heatmap = explanation.get_image_and_mask(
+            explanation.top_labels[0], 
+            positive_only=False, 
+            negative_only=False, 
+            hide_rest=False,
+            num_features=10
+        )[1]
+        
+        # Use our standardized visualization function for consistent output
+        return create_explanation_visualization(
+            original_image=original_image,
+            heatmap=heatmap,
+            prediction_results=prediction_results,
+            explanation_type="LIME",
+            title2="Feature Importance",
+            title3="Superpixel Boundaries",
+            cmap="RdBu_r",
+            alpha=0.7,
+            third_panel_type="segments",
+            mask=mask
+        )
+        
+    except Exception as e:
+        # Get the full stack trace for debugging
+        logger.error(f"Error in LIME explanation: {str(e)}")
+        logger.error(f"Traceback: {traceback.format_exc()}")
+        # Fall back to alternative explanation method
+        return generate_fallback_explanation(image_data, model, top_k)
 
 
 @app.route('/flowers_classification_home', methods=['GET'])
@@ -709,7 +1116,7 @@ def home():
         "version": "v1.0",
         "endpoints": {
             "/flowers_classification_home": "Home Page",
-            "/helth_status" : "Check APIs Health",
+            "/health_status" : "Check APIs Health",
             "/v1/predict": "This version of the API is based on VGG19",
             "/v2/predict": "This version of the API is based on VGG13",
             "/v1/explain_shap": "Get SHAP explanations for model v1 predictions",
@@ -747,12 +1154,11 @@ def serve_static(filename):
     static_folder = os.path.join(PROJECT_ROOT, "static")
     return send_file(os.path.join(static_folder, filename))
 
-@app.route('/helth_status', methods=['GET'])
-def helth_check():
-    
+@app.route('/health_status', methods=['GET'])
+def health_check():
     health = {
         "status": "UP",
-        "message": "Flowers Classification is up and ready to recieve request"
+        "message": "Flowers Classification is up and ready to receive request"
     }
     return jsonify(health)
 
@@ -896,8 +1302,9 @@ def explain_shap_v1():
         logger.info(f"Processing image for SHAP explanation with top_k={top_k}")
         np_image = process_base64_image(base64_image)
         
-        # Generate SHAP explanation using the custom implementation
-        explanation = generate_custom_shap_explanation(np_image, model_v1, top_k)
+        # Generate SHAP explanation using the cascading implementation
+        # This will try GradientExplainer first, then DeepExplainer, then fallback to custom
+        explanation = generate_shap_explanation(np_image, model_v1, top_k)
         
         logger.info("SHAP explanation generated successfully")
         return jsonify({
@@ -938,8 +1345,12 @@ def explain_shap_v2():
         logger.info(f"Processing image for SHAP explanation with top_k={top_k}")
         np_image = process_base64_image(base64_image)
         
-        # Generate SHAP explanation using the custom implementation
-        explanation = generate_custom_shap_explanation(np_image, model_v2, top_k)
+        # Generate SHAP explanation using the cascading implementation
+        # This will try GradientExplainer first, then DeepExplainer, then fallback to custom
+        explanation = generate_shap_explanation(np_image, model_v2, top_k)
+        
+        # Log which explanation type was used
+        logger.info(f"SHAP explanation type: {explanation.get('explanation_type', 'unknown')}")
         
         logger.info("SHAP explanation generated successfully")
         return jsonify({

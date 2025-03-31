@@ -9,7 +9,7 @@ import mlflow.pytorch
 import yaml
 from utils.model_configuration import ModelConfiguration as mc
 from utils.arg_parser import get_input_args
-from utils.monitoring import get_training_monitor
+from metrics.monitoring import get_training_monitor
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
