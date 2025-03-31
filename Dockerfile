@@ -17,10 +17,10 @@ RUN mkdir -p models predictions data/raw data/processed data/external
 
 # Set environment variables
 ENV PYTHONPATH=/app
-ENV FLASK_APP=predict_api.py
+ENV FLASK_APP=api_main.py
 
 # Expose port for the API
 EXPOSE 9000
 
 # Default command runs the API
-CMD ["python", "predict_api.py"]
+CMD ["python", "api_main.py"]
