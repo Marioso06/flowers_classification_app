@@ -8,3 +8,4 @@ mlartifacts/
 data/raw/
 tests/archive
 data/flowers
+static/
