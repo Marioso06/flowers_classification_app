@@ -1,84 +1,93 @@
-# Flower Classification Makefile Guide
+# 🌸 Flower Classification – Makefile Guide
 
-This project provides a Makefile to manage the environment setup and tasks for training and prediction of a flower classification model. Depending on your hardware setup (AMD GPU, NVIDIA GPU, or CPU), you can initialize the environment accordingly.
-
-## Makefile Commands
-
-### Environment Setup
-- **AMD GPU Setup (ROCm)**
-
-```bash
-make init-amd
-```
-
-This command sets up a virtual environment with PyTorch optimized for AMD GPUs using ROCm.
-
-- **CPU Setup**
-
-```bash
-make init-cpu
-```
-
-This command sets up a virtual environment with PyTorch for CPU-based processing.
-
-- **NVIDIA GPU Setup**
-
-```bash
-make init-gpu
-```
-This command sets up a virtual environment with PyTorch optimized for NVIDIA GPUs.
-
-### Running Tasks
-- **Train the Model**
-
-```bash
-make train
-```
-Executes the `train.py` script located in the `src` directory to train the flower classification model.
-
-- **Run Predictions**
-
-```bash
-make predict
-```
-Executes the `predict.py` script located in the `src` directory to make predictions with the trained model.
-
-### Cleaning Up
-- **Clean Cache and Logs**
-
-```bash
-make clean
-```
-Removes `__pycache__` directories, the virtual environment, and pytest cache files.
-
-### Help
-- **Display Available Commands**
-
-```bash
-make help
-```
-Lists all available Makefile commands with a brief description.
+This project uses a `Makefile` to streamline environment setup and common tasks for training and running a flower classification model. Depending on your system’s hardware—AMD GPU, NVIDIA GPU, or CPU—you can initialize the environment accordingly and get started quickly.
 
 ---
 
-## Instructions for Environment Setup
+## 🛠️ Makefile Commands
 
-1. Choose the appropriate setup based on your hardware:
- - **AMD GPU**: Use `make init-amd`.
- - **CPU**: Use `make init-cpu`.
- - **NVIDIA GPU**: Use `make init-gpu`.
- 
-2. After the setup is complete, activate the virtual environment:
+### 🔧 Environment Setup
 
-```bash
-source .flower_classification/bin/activate
-```
+Choose the appropriate command based on your hardware:
 
-3. Install additional dependencies if needed by editing `requirements.txt`.
+- **AMD GPU (ROCm)**  
+  Sets up a virtual environment with PyTorch configured for AMD GPUs using ROCm.
+  ```bash
+  make init-amd
+  ```
+
+- **NVIDIA GPU (CUDA)**  
+  Sets up a virtual environment with PyTorch configured for NVIDIA GPUs.
+  ```bash
+  make init-gpu
+  ```
+
+- **CPU Only**  
+  Sets up a virtual environment with the CPU version of PyTorch.
+  ```bash
+  make init-cpu
+  ```
 
 ---
 
-## Notes
-- Ensure your hardware supports the chosen setup (ROCm for AMD, CUDA for NVIDIA).
-- For AMD GPU setup, specific ROCm libraries and configurations are handled in the `init-amd` target.
-- The `clean` command will remove the virtual environment, so use it with caution if you need to keep the environment for future use.
+### 🚀 Running Tasks
+
+- **Train the Model**  
+  Runs `train.py` from the `src/` directory to train your flower classification model.
+  ```bash
+  make train
+  ```
+
+- **Make Predictions**  
+  Runs `predict.py` from the `src/` directory to generate predictions using the trained model.
+  ```bash
+  make predict
+  ```
+
+---
+
+### 🧹 Cleaning Up
+
+- **Clean Environment and Caches**  
+  Removes `__pycache__` directories, virtual environment files, and pytest caches.
+  ```bash
+  make clean
+  ```
+
+---
+
+### 📋 Show Help
+
+- **List All Available Commands**  
+  Displays a summary of all available Makefile targets.
+  ```bash
+  make help
+  ```
+
+---
+
+## ⚙️ Environment Setup Instructions
+
+1. **Select your hardware** and run the appropriate setup command:  
+   - AMD GPU: `make init-amd`  
+   - NVIDIA GPU: `make init-gpu`  
+   - CPU: `make init-cpu`
+
+2. **Activate the virtual environment:**
+   ```bash
+   source .flower_classification/bin/activate
+   ```
+
+3. **Install extra dependencies** (if needed) by editing the `requirements.txt` file.
+
+---
+
+## 📝 Notes
+
+- Ensure your system supports the selected configuration:
+  - ROCm for AMD GPUs
+  - CUDA for NVIDIA GPUs
+
+- The `init-amd` target includes additional ROCm-specific configurations.
+
+- The `make clean` command deletes the virtual environment. Use with caution if you plan to reuse the environment.
