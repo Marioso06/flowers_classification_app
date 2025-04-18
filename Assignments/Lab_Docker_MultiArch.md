@@ -37,32 +37,93 @@ This creates compatibility issues in different environments:
 1. **Portability**: Run the same images across different types of hardware
 2. **Consistent Environment**: Ensure identical behavior regardless of underlying architecture
 3. **Simplified CI/CD**: Maintain a single image tag/reference for multiple architectures
+
+---
+
+> **Summary of Key Correction:**
+> - `docker-compose build` does NOT support multi-architecture builds. Use `docker buildx build` with the `--platform` flag and `--push`.
+> - Reference built images in your compose file, do not rely on local builds for multi-arch support.
 4. **Future-Proofing**: Support for emerging hardware platforms
+
+## Prerequisites
+
+Before starting, ensure you have:
+
+- Docker 19.03+ with Buildx enabled (Docker Desktop or recent Docker Engine)
+- QEMU emulation binaries installed (for cross-building)
+- Access to a Docker registry (e.g., Docker Hub)
+- (Optional) Docker Compose v2 for advanced features
 
 ## Multi-Architecture Approaches in Docker
 
-Docker supports several approaches to create multi-architecture images:
+Docker supports several approaches to create multi-architecture images. The recommended method is using Buildx.
 
 ### 1. Docker Buildx with Multi-Platform Builds
 
 [Docker Buildx](https://docs.docker.com/buildx/working-with-buildx/) is the recommended modern tool for building multi-architecture images. It's built into Docker Desktop and recent Docker CLI versions.
 
-#### Setting Up Buildx
+#### Step-by-Step: Building and Pushing Multi-Arch Images
 
-```bash
-# Check if buildx is available
+1. **Enable Buildx (if not already):**
+   ```bash
+   docker buildx create --use
+   ```
+2. **Set up QEMU emulation (for cross-building):**
+   ```bash
+   docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+   ```
+3. **Build and push a multi-arch image:**
+   ```bash
+   docker buildx build --platform linux/amd64,linux/arm64 -t <your-username>/<image-name>:<tag> --push .
+   ```
+   Replace `<your-username>`, `<image-name>`, and `<tag>` as appropriate.
+
+4. **Repeat for each service** (if you have multiple Dockerfiles/services).
+
+#### Referencing Multi-Arch Images in docker-compose.yml
+
+Once your images are built and pushed, update your `docker-compose.yml` to use the pushed images:
+
+```yaml
+services:
+  flower-app:
+    image: <your-username>/<image-name>:<tag>
+  mlflow:
+    image: <your-username>/<mlflow-image>:<tag>
+  # ... other services
+```
+
+All collaborators and deployment environments should pull these images, not build locally.
+
+#### (Optional) Advanced: Multi-Service Builds with Buildx Bake
+
+For advanced users, [Buildx Bake](https://docs.docker.com/build/bake/) can build multiple services (like Compose) with multi-arch support. This is optional and not required for most student projects.
+
+#### Testing Multi-Arch Images
+
+- **On Local Hardware:** Use real hardware (e.g., x86_64 and arm64 machines) if available.
+- **Using Emulation:**
+  ```bash
+  docker run --platform=linux/arm64 <your-username>/<image-name>:<tag>
+  docker run --platform=linux/amd64 <your-username>/<image-name>:<tag>
+  ```
+- **On Cloud:** Deploy to cloud VMs of different architectures to confirm compatibility.
+
+---
+
+#### Check if buildx is available
 docker buildx version
 
-# Create a new builder instance with multi-architecture support
+#### Create a new builder instance with multi-architecture support
+```bash
 docker buildx create --name multiarch-builder --use
 
 # Verify the builder and supported platforms
+
 docker buildx inspect
-```
 
-#### Building Multi-Architecture Images
+# Building Multi-Architecture Images
 
-```bash
 docker buildx build --platform linux/amd64,linux/arm64 -t yourusername/appname:tag --push .
 ```
 
@@ -154,7 +215,7 @@ docker buildx inspect multiarch-builder >/dev/null 2>&1 || \
 echo "Building multi-architecture app image..."
 docker buildx build \
   --platform linux/amd64,linux/arm64 \
-  -t yourusername/flowers-classification:latest \
+  -t masorian06/flowers-classification:latest \
   --push \
   -f Dockerfile .
 
@@ -162,7 +223,7 @@ docker buildx build \
 echo "Building multi-architecture MLflow image..."
 docker buildx build \
   --platform linux/amd64,linux/arm64 \
-  -t yourusername/flowers-mlflow:latest \
+  -t masorian06/flowers-mlflow:latest \
   --push \
   -f Dockerfile.mlflow .
 
